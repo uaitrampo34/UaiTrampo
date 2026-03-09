@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-primary: #FFD700;
+  --color-secondary: #EA580C;
+  --color-emerald-uai: #10B981;
+  --color-background-dark: #0A0A0A;
+  --color-card-dark: #171717;
+}
+
+@layer base {
+  body {
+    @apply bg-background-dark text-slate-100 antialiased;
+  }
+}
+
+.gold-glow {
+  box-shadow: 0 0 15px -5px rgba(255, 215, 0, 0.3);
+}
+
+.premium-border {
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.text-shadow-black {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
