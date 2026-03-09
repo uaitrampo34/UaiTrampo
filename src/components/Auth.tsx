@@ -12,7 +12,7 @@ import { motion } from 'motion/react';
 import { toast } from 'sonner';
 import { Screen } from '../types';
 
-export const LoginScreen = ({ onNext }: { onNext: (s: Screen) => void }) => (
+export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void, onVisitor: () => void }) => (
   <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-between relative overflow-hidden">
     <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
     <div className="absolute bottom-[-10%] left-[-10%] w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
@@ -64,7 +64,7 @@ export const LoginScreen = ({ onNext }: { onNext: (s: Screen) => void }) => (
       <button 
         onClick={() => {
           toast.success('Entrando como visitante...');
-          onNext('home');
+          onVisitor();
         }}
         className="w-full bg-white/5 border border-white/10 py-6 rounded-3xl font-bold text-white hover:bg-white/10 transition-all backdrop-blur-md"
       >

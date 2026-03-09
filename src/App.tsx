@@ -25,6 +25,7 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [screen, setScreen] = useState<Screen>('login');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isVisitor, setIsVisitor] = useState(false);
   
   const { 
     providers, 
@@ -40,6 +41,13 @@ export default function App() {
 
   const handleLogin = (adminStatus: boolean) => {
     setIsAdmin(adminStatus);
+    setIsVisitor(false);
+    setScreen('home');
+  };
+
+  const handleVisitorAccess = () => {
+    setIsVisitor(true);
+    setIsAdmin(false);
     setScreen('home');
   };
 
@@ -64,7 +72,7 @@ export default function App() {
 
     switch (screen) {
       case 'login': 
-        return <LoginScreen onNext={setScreen} />;
+        return <LoginScreen onNext={setScreen} onVisitor={handleVisitorAccess} />;
       case 'register': 
         return <RegisterScreen onNext={setScreen} />;
       case 'verify': 
@@ -72,7 +80,16 @@ export default function App() {
       case 'login-prompt': 
         return <LoginPromptScreen onBack={() => setScreen('login')} onLogin={handleLogin} />;
       case 'home': 
-        return <HomeScreen providers={providers} isAdmin={isAdmin} onDelete={deleteProvider} onProfile={() => setScreen('profile')} />;
+        return (
+          <HomeScreen 
+            providers={providers} 
+            isAdmin={isAdmin} 
+            isVisitor={isVisitor}
+            onDelete={deleteProvider} 
+            onProfile={() => setScreen('profile')} 
+            onLoginRequired={() => setScreen('login-prompt')}
+          />
+        );
       case 'explore': 
         return <ExploreScreen />;
       case 'profile': 
@@ -82,7 +99,7 @@ export default function App() {
       case 'add-provider': 
         return <AddProviderScreen onBack={() => setScreen('profile')} onAdd={handleAddProvider} />;
       default: 
-        return <LoginScreen onNext={setScreen} />;
+        return <LoginScreen onNext={setScreen} onVisitor={handleVisitorAccess} />;
     }
   };
 
