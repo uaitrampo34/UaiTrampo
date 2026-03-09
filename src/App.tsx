@@ -36,9 +36,10 @@ import {
   Briefcase
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Toaster, toast } from 'sonner';
 
 // --- Types ---
-type Screen = 'login' | 'register' | 'verify' | 'home' | 'explore' | 'profile' | 'settings';
+type Screen = 'login' | 'register' | 'verify' | 'home' | 'explore' | 'profile' | 'settings' | 'login-prompt';
 
 // --- Components ---
 
@@ -69,7 +70,15 @@ const BottomNav = ({ currentScreen, setScreen }: { currentScreen: Screen, setScr
           </div>
           
           {currentScreen === 'home' && (
-            <button className="flex-1 bg-emerald-uai hover:bg-emerald-600 text-white font-black py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-emerald-uai/10 text-shadow-black">
+            <button 
+              onClick={() => {
+                window.open(`https://wa.me/5534996506860?text=Opa!%20Quero%20trabalhar%20cô%20vcs%20no%20UaiTrampo!`, '_blank');
+                toast.success('Abrindo WhatsApp do Recrutador!', {
+                  description: 'Boa sorte no trampo, uai!'
+                });
+              }}
+              className="flex-1 bg-emerald-uai hover:bg-emerald-600 text-white font-black py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-emerald-uai/10 text-shadow-black"
+            >
               <Hammer size={18} />
               <span className="text-sm uppercase tracking-tight">TRABALHAR CÔ NÓIS, UAI!</span>
             </button>
@@ -101,10 +110,16 @@ const Header = ({ title, onBack, rightAction }: { title?: string, onBack?: () =>
       <div className="flex items-center gap-2">
         {rightAction || (
           <>
-            <button className="p-2 rounded-full hover:bg-white/10 transition-colors text-slate-300">
+            <button 
+              onClick={() => toast.info('Perfil do Visitante', { description: 'Faça login para ver todos os dados.' })}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors text-slate-300"
+            >
               <User size={24} />
             </button>
-            <button className="p-2 rounded-full hover:bg-white/10 transition-colors text-slate-300">
+            <button 
+              onClick={() => toast.info('Menu acessado', { description: 'Abrindo o painel lateral...' })}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors text-slate-300"
+            >
               <Menu size={24} />
             </button>
           </>
@@ -156,8 +171,8 @@ const LoginScreen = ({ onNext }: { onNext: (s: Screen) => void }) => (
         </button>
         
         <button 
-          onClick={() => onNext('home')}
-          className="flex items-center justify-center gap-3 rounded-xl h-14 px-5 bg-primary hover:bg-[#E6C200] transition-all text-background-dark text-base font-bold tracking-wide w-full shadow-[0_4px_20px_rgba(255,215,0,0.2)]"
+          onClick={() => onNext('login-prompt')}
+          className="flex items-center justify-center gap-3 rounded-xl h-14 px-5 bg-primary hover:bg-[#E6C200] transition-all text-background-dark text-base font-bold tracking-wide w-full shadow-[0_4px_20px_rgba(255,215,0,0.25)]"
         >
           <LogIn size={20} />
           <span className="text-lg">Entrar na conta</span>
@@ -170,7 +185,10 @@ const LoginScreen = ({ onNext }: { onNext: (s: Screen) => void }) => (
         </div>
 
         <button 
-          onClick={() => onNext('home')}
+          onClick={() => {
+            toast.success('Bão demais!', { description: 'Você entrou como visitante.' });
+            onNext('home');
+          }}
           className="flex items-center justify-center gap-2 rounded-xl h-14 px-5 bg-zinc-800/50 hover:bg-zinc-800 transition-colors text-zinc-300 text-base font-bold tracking-wide w-full border border-white/5"
         >
           <span>Continuar como visitante</span>
@@ -180,12 +198,26 @@ const LoginScreen = ({ onNext }: { onNext: (s: Screen) => void }) => (
       <div className="mt-auto pt-8 flex flex-col items-center gap-4">
         <p className="text-slate-500 text-xs text-center">
           Ao prosseguir, você concorda com nossos <br/>
-          <a className="text-primary hover:underline font-medium" href="#">Termos de Uso</a> e <a className="text-primary hover:underline font-medium" href="#">Privacidade</a>.
+          <button onClick={() => toast.info('Abrindo Termos de Uso...')} className="text-primary hover:underline font-medium">Termos de Uso</button> e <button onClick={() => toast.info('Abrindo Política de Privacidade...')} className="text-primary hover:underline font-medium">Privacidade</button>.
         </p>
         <div className="flex gap-6 mt-2">
-          <Globe className="text-slate-600 cursor-pointer hover:text-primary transition-colors" size={20} />
-          <HelpCircle className="text-slate-600 cursor-pointer hover:text-primary transition-colors" size={20} />
-          <Share2 className="text-slate-600 cursor-pointer hover:text-primary transition-colors" size={20} />
+          <Globe onClick={() => toast.info('Idiomas extras indisponíveis na versão atual.', { icon: '🇧🇷' })} className="text-slate-600 cursor-pointer hover:text-primary transition-colors" size={20} />
+          <HelpCircle onClick={() => toast.info('Abrindo chat de suporte...')} className="text-slate-600 cursor-pointer hover:text-primary transition-colors" size={20} />
+          <Share2 
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'UaiTrampo',
+                  text: 'Encontre os mió serviço de Frutal no UaiTrampo!',
+                  url: 'https://uaitrampo.com'
+                }).catch(console.error);
+              } else {
+                navigator.clipboard.writeText('https://uaitrampo.com');
+                toast.success('Link do UaiTrampo copiado com sucesso!');
+              }
+            }} 
+            className="text-slate-600 cursor-pointer hover:text-primary transition-colors" size={20} 
+          />
         </div>
       </div>
     </div>
@@ -240,7 +272,10 @@ const VerificationScreen = ({ onBack, onVerify }: { onBack: () => void, onVerify
         </div>
 
         <button 
-          onClick={onVerify}
+          onClick={() => {
+            toast.success('Pronto, uai!', { description: 'Sua conta foi verificada com sucesso.' });
+            onVerify();
+          }}
           className="w-full bg-emerald-uai hover:bg-emerald-600 py-5 rounded-3xl text-white font-bold text-lg shadow-xl shadow-emerald-uai/20 transition-transform active:scale-95 text-shadow-black"
         >
           VERIFICAR AGORA
@@ -248,7 +283,12 @@ const VerificationScreen = ({ onBack, onVerify }: { onBack: () => void, onVerify
 
         <div className="mt-8 text-center">
           <p className="text-slate-400">Não recebeu nada?</p>
-          <button className="mt-2 text-primary font-bold hover:underline">Mandar de novo, uai!</button>
+          <button 
+            onClick={() => toast.success('Mandei de novo! Olha a caixa de spam.', { icon: '📬' })}
+            className="mt-2 text-primary font-bold hover:underline"
+          >
+            Mandar de novo, uai!
+          </button>
         </div>
       </main>
     </div>
@@ -322,7 +362,7 @@ const RegisterScreen = ({ onBack, onNext }: { onBack: () => void, onNext: (s: Sc
         <div className="flex items-center gap-3 px-2 py-2">
           <input className="size-5 rounded border-zinc-700 text-primary focus:ring-primary bg-transparent" id="terms" type="checkbox" />
           <label className="text-xs text-slate-400" htmlFor="terms">
-            Li e concordo com os <a className="text-primary underline" href="#">Termos de Uso</a> e <a className="text-primary underline" href="#">Privacidade</a>.
+            Li e concordo com os <button type="button" onClick={() => toast.info('Abrindo Termos de Uso...')} className="text-primary underline">Termos de Uso</button> e <button type="button" onClick={() => toast.info('Abrindo Política de Privacidade...')} className="text-primary underline">Privacidade</button>.
           </label>
         </div>
 
@@ -360,7 +400,7 @@ const HomeScreen = () => (
     <section className="px-4 py-2">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold">Categorias</h3>
-        <a className="text-sm text-primary font-medium" href="#">Ver todas</a>
+        <button onClick={() => toast.info('Abrindo todas as categorias...')} className="text-sm text-primary font-medium">Ver todas</button>
       </div>
       <div className="grid grid-cols-3 gap-3">
         {[
@@ -368,12 +408,16 @@ const HomeScreen = () => (
           { icon: Zap, label: 'Luz e Gambiarra' },
           { icon: Wrench, label: 'Ajeitar o trem' },
         ].map((cat) => (
-          <div key={cat.label} className="flex flex-col items-center gap-3 p-4 rounded-xl border border-white/5 bg-card-dark hover:border-primary/50 transition-all">
+          <button 
+            key={cat.label} 
+            onClick={() => toast.info(`Filtrando: ${cat.label}`)}
+            className="flex flex-col items-center gap-3 p-4 rounded-xl border border-white/5 bg-card-dark hover:border-primary/50 transition-all active:scale-95"
+          >
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 border border-primary/20">
               <cat.icon className="text-primary" size={24} />
             </div>
             <span className="text-[10px] font-semibold text-center uppercase tracking-wider">{cat.label}</span>
-          </div>
+          </button>
         ))}
       </div>
     </section>
@@ -415,7 +459,13 @@ const HomeScreen = () => (
                 <MapPin className="text-primary" size={16} />
                 Frutal, MG
               </div>
-              <button className="bg-emerald-uai hover:bg-emerald-600 text-white font-extrabold py-2 px-6 rounded-lg flex items-center gap-2 transition-transform active:scale-95 text-shadow-black">
+              <button 
+                onClick={() => {
+                  window.open(`https://wa.me/5534999999999?text=Opa!%20Te%20achei%20no%20UaiTrampo...`, '_blank');
+                  toast.success('Abrindo WhatsApp!');
+                }}
+                className="bg-emerald-uai hover:bg-emerald-600 text-white font-extrabold py-2 px-6 rounded-lg flex items-center gap-2 transition-transform active:scale-95 text-shadow-black"
+              >
                 <MessageCircle size={16} />
                 Chamar no zap, sô!
               </button>
@@ -460,18 +510,22 @@ const ExploreScreen = () => (
         { icon: Flower2, label: 'Jardinagem' },
         { icon: Droplets, label: 'Hidráulica' },
       ].map((cat) => (
-        <div key={cat.label} className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-primary/50 transition-all cursor-pointer group shadow-lg">
+        <button 
+          key={cat.label} 
+          onClick={() => toast.info(`Mostrando categoria: ${cat.label} ...`)}
+          className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-primary/50 transition-all active:scale-95 cursor-pointer group shadow-lg"
+        >
           <div className="bg-primary/10 p-4 rounded-full group-hover:bg-primary/20 transition-colors">
             <cat.icon className="text-primary" size={32} />
           </div>
           <span className="font-semibold text-zinc-200 group-hover:text-primary transition-colors">{cat.label}</span>
-        </div>
+        </button>
       ))}
     </div>
   </div>
 );
 
-const ProfileScreen = ({ onSettings }: { onSettings: () => void }) => {
+const ProfileScreen = ({ isAdmin, onSettings }: { isAdmin: boolean, onSettings: () => void }) => {
   const [available, setAvailable] = useState(true);
 
   return (
@@ -502,10 +556,16 @@ const ProfileScreen = ({ onSettings }: { onSettings: () => void }) => {
           </div>
           
           <div className="flex flex-col items-center justify-center">
-            <p className="text-2xl font-bold leading-tight tracking-tight text-center">Bão demais ver ocê!</p>
-            <p className="text-primary text-base font-medium leading-normal text-center mt-1">Uai, cê tá chique demais!</p>
-            <div className="mt-2 px-3 py-1 bg-primary/20 rounded-full border border-primary/40">
-              <p className="text-primary text-xs font-bold uppercase tracking-widest">Nível Ouro</p>
+            <p className="text-2xl font-bold leading-tight tracking-tight text-center">
+              {isAdmin ? 'Olá, Mestre Davi!' : 'Bão demais ver ocê!'}
+            </p>
+            <p className="text-primary text-base font-medium leading-normal text-center mt-1">
+              {isAdmin ? 'O sistema tá no seu comando.' : 'Uai, cê tá chique demais!'}
+            </p>
+            <div className={`mt-2 px-3 py-1 rounded-full border ${isAdmin ? 'bg-rose-500/20 border-rose-500/40 text-rose-500' : 'bg-primary/20 border-primary/40 text-primary'}`}>
+              <p className="text-[10px] font-black uppercase tracking-widest">
+                {isAdmin ? 'ADMIN / DEVELOPER' : 'Nível Ouro'}
+              </p>
             </div>
           </div>
         </div>
@@ -517,7 +577,11 @@ const ProfileScreen = ({ onSettings }: { onSettings: () => void }) => {
           { icon: Briefcase, title: 'Ajeitar meus trens', sub: 'Gerencie seus serviços e preços', color: 'text-emerald-uai' },
           { icon: Star, title: 'Ver o que o povo tá falando', sub: 'Suas avaliações e comentários', color: 'text-emerald-uai' },
         ].map((item) => (
-          <button key={item.title} className="flex items-center gap-4 px-6 py-4 hover:bg-emerald-uai/5 transition-colors border-b border-slate-800/50 w-full text-left">
+          <button 
+            key={item.title} 
+            onClick={() => toast.info(`Acessando painel: ${item.title}...`)}
+            className="flex items-center gap-4 px-6 py-4 hover:bg-emerald-uai/5 transition-colors border-b border-slate-800/50 w-full text-left"
+          >
             <item.icon className={item.color} size={24} />
             <div className="flex-1">
               <p className="text-base font-medium">{item.title}</p>
@@ -526,6 +590,34 @@ const ProfileScreen = ({ onSettings }: { onSettings: () => void }) => {
             <ChevronRight className="text-slate-500" size={20} />
           </button>
         ))}
+
+        {isAdmin && (
+          <>
+            <h3 className="text-rose-500 text-sm font-bold uppercase tracking-widest px-6 pb-2 mt-6 flex items-center gap-2">
+              <ShieldCheck size={16} />
+              Controle do Sistema (DEV)
+            </h3>
+            {[
+              { icon: User, title: 'Gerenciar Todos Usuários', sub: 'Editar, banir ou promover membros', color: 'text-rose-500' },
+              { icon: MapPin, title: 'Aprovar Novos Prestadores', sub: '12 solicitações pendentes', color: 'text-rose-500' },
+              { icon: Info, title: 'Logs e Erros', sub: 'Verificar saúde do servidor', color: 'text-rose-500' },
+              { icon: Settings, title: 'Configurações Globais', sub: 'Taxas, Categorias e Regiões', color: 'text-rose-500' },
+            ].map((item) => (
+              <button 
+                key={item.title} 
+                onClick={() => toast.info(`Módulo Administrador: ${item.title}`, { icon: '🛠️' })}
+                className="flex items-center gap-4 px-6 py-4 hover:bg-rose-500/5 transition-colors border-b border-slate-800/50 w-full text-left"
+              >
+                <item.icon className={item.color} size={24} />
+                <div className="flex-1">
+                  <p className="text-base font-medium">{item.title}</p>
+                  <p className="text-slate-400 text-xs">{item.sub}</p>
+                </div>
+                <ChevronRight className="text-slate-500" size={20} />
+              </button>
+            ))}
+          </>
+        )}
         
         <div className="flex items-center gap-4 px-6 py-4 hover:bg-emerald-uai/5 transition-colors border-b border-slate-800/50">
           <HomeIcon className="text-emerald-uai" size={24} />
@@ -545,7 +637,10 @@ const ProfileScreen = ({ onSettings }: { onSettings: () => void }) => {
         </div>
 
         <h3 className="text-primary text-sm font-bold uppercase tracking-widest px-6 pb-2 mt-6">Minha Conta</h3>
-        <button className="flex items-center gap-4 px-6 py-4 hover:bg-primary/5 transition-colors border-b border-slate-800/50 w-full text-left">
+        <button 
+          onClick={() => toast.info(`Abrindo formulário de Meus Dados...`)}
+          className="flex items-center gap-4 px-6 py-4 hover:bg-primary/5 transition-colors border-b border-slate-800/50 w-full text-left"
+        >
           <User className="text-primary" size={24} />
           <div className="flex-1">
             <p className="text-base font-medium">Meus Dados</p>
@@ -554,7 +649,14 @@ const ProfileScreen = ({ onSettings }: { onSettings: () => void }) => {
           <ChevronRight className="text-slate-500" size={20} />
         </button>
         
-        <button className="flex items-center gap-4 px-6 py-4 hover:bg-red-500/5 transition-colors group w-full text-left">
+        <button 
+          onClick={() => {
+            toast('Até a próxima, uai!', { icon: '👋' });
+            // For now just redirect to login screen since routing isn't there
+            window.location.reload(); 
+          }}
+          className="flex items-center gap-4 px-6 py-4 hover:bg-red-500/5 transition-colors group w-full text-left"
+        >
           <LogOut className="text-red-500 group-hover:scale-110 transition-transform" size={24} />
           <div className="flex-1">
             <p className="text-base font-medium text-red-500">Arredar o pé</p>
@@ -584,12 +686,18 @@ const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
                 <p className="text-slate-400 text-xs">Alertas de novos serviços</p>
               </div>
             </div>
-            <button className="relative flex h-[28px] w-[48px] items-center rounded-full bg-primary p-1 justify-end">
+            <button 
+              onClick={() => toast.success('Pronto!', { description: 'Suas preferências de notificação foram salvas.' })}
+              className="relative flex h-[28px] w-[48px] items-center rounded-full bg-primary p-1 justify-end"
+            >
               <div className="h-full aspect-square rounded-full bg-white shadow-md" />
             </button>
           </div>
           
-          <div className="flex items-center gap-4 px-4 py-4 justify-between">
+          <button 
+            onClick={() => toast.info('Abrindo configurações de segurança...')}
+            className="flex w-full items-center gap-4 px-4 py-4 justify-between hover:bg-white/5 transition-colors text-left"
+          >
             <div className="flex items-center gap-4">
               <div className="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-10">
                 <Lock size={20} />
@@ -600,7 +708,7 @@ const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
               </div>
             </div>
             <ChevronRight className="text-slate-500" size={20} />
-          </div>
+          </button>
         </div>
       </section>
 
@@ -612,7 +720,13 @@ const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
           <h3 className="text-xl font-bold">Precisa de uma mãozinha?</h3>
           <p className="text-slate-300 text-sm mt-1">Nossa equipe tá de prontidão pra te ajudar com qualquer trem.</p>
         </div>
-        <button className="w-full bg-emerald-uai text-white font-bold py-3 px-6 rounded-lg shadow-xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-2">
+        <button 
+          onClick={() => {
+            window.open(`https://wa.me/5534999999999?text=Oi%20equipe%20do%20UaiTrampo,%20preciso%20de%20ajuda!`, '_blank');
+            toast.success('Iniciando atendimento...');
+          }}
+          className="w-full bg-emerald-uai text-white font-bold py-3 px-6 rounded-lg shadow-xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
+        >
           Falar com o Suporte
           <MessageCircle size={16} />
         </button>
@@ -625,7 +739,11 @@ const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
             { icon: Info, label: 'Termos e Condições' },
             { icon: ShieldCheck, label: 'Privacidade' },
           ].map((item) => (
-            <button key={item.label} className="flex items-center gap-4 px-4 py-4 justify-between border-b border-white/5 w-full">
+            <button 
+              key={item.label} 
+              onClick={() => toast.info(`Lendo ${item.label}...`)}
+              className="flex items-center gap-4 px-4 py-4 justify-between border-b border-white/5 w-full hover:bg-white/5 transition-colors"
+            >
               <div className="flex items-center gap-4">
                 <div className="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-10">
                   <item.icon size={20} />
@@ -649,7 +767,13 @@ const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
         </div>
       </section>
 
-      <button className="flex items-center justify-center gap-2 w-full py-4 text-rose-500 font-bold hover:bg-rose-500/5 rounded-xl transition-colors">
+      <button 
+        onClick={() => {
+          toast('Até a próxima, uai!', { icon: '👋' });
+          window.location.reload(); 
+        }}
+        className="flex items-center justify-center gap-2 w-full py-4 text-rose-500 font-bold hover:bg-rose-500/5 rounded-xl transition-colors mt-2"
+      >
         <LogOut size={20} />
         Sair do trem
       </button>
@@ -657,19 +781,104 @@ const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
   </div>
 );
 
+const LoginPromptScreen = ({ onBack, onLogin }: { onBack: () => void, onLogin: (isAdmin: boolean) => void }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email === 'uaitrampo34@gmail.com' && password === 'Davi2602') {
+      toast.success('Acesso DEV concedido!', { 
+        description: 'Bão demais ter ocê no controle, Davi!',
+        icon: '🛠️'
+      });
+      onLogin(true);
+    } else {
+      if (email && password) {
+        toast.success('Login realizado com sucesso!');
+        onLogin(false);
+      } else {
+        toast.error('Preencha os dados de login, uai!');
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background-dark">
+      <header className="flex items-center justify-between p-4 pt-6">
+        <button onClick={onBack} className="flex items-center justify-center size-10 rounded-full bg-zinc-900 text-primary">
+          <ArrowLeft size={24} />
+        </button>
+        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+          <Lock className="text-background-dark" size={24} />
+        </div>
+        <div className="size-10" />
+      </header>
+
+      <main className="flex-1 px-6 pt-4 pb-12 flex flex-col">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-primary mb-2">Entrar na conta</h1>
+          <p className="text-slate-400 text-lg">Acesse sua conta pra gerenciar seus trens.</p>
+        </div>
+
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold ml-2 text-slate-300">E-mail</label>
+            <div className="relative">
+              <Info className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input 
+                className="w-full pl-12 pr-4 py-4 bg-zinc-900 border border-zinc-800 rounded-3xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white" 
+                placeholder="seu@email.com" 
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold ml-2 text-slate-300">Senha</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input 
+                className="w-full pl-12 pr-12 py-4 bg-zinc-900 border border-zinc-800 rounded-3xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white" 
+                placeholder="Sua senha benta" 
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <button className="w-full bg-primary hover:bg-[#E6C200] py-5 rounded-3xl text-background-dark font-bold text-lg shadow-xl shadow-primary/20 transition-transform active:scale-95 mt-4" type="submit">
+            ENTRAR AGORA
+          </button>
+        </form>
+      </main>
+    </div>
+  );
+};
+
 // --- Main App ---
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('login');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const handleLogin = (adminStatus: boolean) => {
+    setIsAdmin(adminStatus);
+    setScreen('home');
+  };
 
   const renderScreen = () => {
     switch (screen) {
       case 'login': return <LoginScreen onNext={setScreen} />;
+      case 'login-prompt': return <LoginPromptScreen onBack={() => setScreen('login')} onLogin={handleLogin} />;
       case 'register': return <RegisterScreen onBack={() => setScreen('login')} onNext={setScreen} />;
       case 'verify': return <VerificationScreen onBack={() => setScreen('register')} onVerify={() => setScreen('home')} />;
       case 'home': return <HomeScreen />;
       case 'explore': return <ExploreScreen />;
-      case 'profile': return <ProfileScreen onSettings={() => setScreen('settings')} />;
+      case 'profile': return <ProfileScreen isAdmin={isAdmin} onSettings={() => setScreen('settings')} />;
       case 'settings': return <SettingsScreen onBack={() => setScreen('profile')} />;
       default: return <HomeScreen />;
     }
@@ -679,6 +888,7 @@ export default function App() {
 
   return (
     <div className="max-w-md mx-auto min-h-screen bg-background-dark text-slate-100 font-sans selection:bg-primary selection:text-background-dark">
+      <Toaster theme="dark" position="top-center" richColors />
       <AnimatePresence mode="wait">
         <motion.div
           key={screen}
