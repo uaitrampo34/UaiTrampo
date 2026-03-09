@@ -119,18 +119,18 @@ export const HomeScreen = ({
 
 export const ExploreScreen = () => (
   <div className="min-h-screen bg-background-dark p-6 pb-32">
-    <h2 className="text-4xl font-black text-white italic tracking-tighter mb-8 mt-4">EXPLORAR <br /><span className="text-primary not-italic">SERVIÇOS</span></h2>
+    <h2 className="text-3xl font-bold text-white mb-8 mt-4">Explorar Serviços</h2>
     
-    <div className="relative mb-8">
-      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={20} />
+    <div className="relative mb-6">
+      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
       <input 
         type="text" 
         placeholder="O que você tá precisando hoje?" 
-        className="w-full bg-white/5 border border-white/10 p-6 pl-12 rounded-3xl text-white font-bold outline-none focus:border-primary transition-all backdrop-blur-md"
+        className="w-full bg-white/5 border border-white/10 p-4 pl-12 rounded-2xl text-white font-medium outline-none focus:border-primary transition-all"
       />
     </div>
 
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-3">
       <CategoryCard icon={<Truck />} label="Mudanças" color="bg-purple-600" onClick={() => toast.info('Abrindo Mudanças...')} />
       <CategoryCard icon={<Clock />} label="Faxina" color="bg-emerald-500" onClick={() => toast.info('Abrindo Faxina...')} />
       <CategoryCard icon={<Hammer />} label="Obras" color="bg-orange-500" onClick={() => toast.info('Abrindo Obras...')} />

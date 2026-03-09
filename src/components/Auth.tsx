@@ -5,60 +5,32 @@ import {
   HelpCircle, 
   Share2, 
   CheckCircle2, 
-  ShieldCheck, 
-  LogIn
+  Mail, 
+  Lock, 
+  User,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 import { Screen } from '../types';
 
 export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void, onVisitor: () => void }) => (
-  <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-between relative overflow-hidden">
-    <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
-    <div className="absolute bottom-[-10%] left-[-10%] w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
-    
-    <div className="flex justify-between items-center z-10">
-      <div className="p-3 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center rotate-12">
-          <ArrowRight className="text-background-dark -rotate-12" size={20} />
-        </div>
+  <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-center items-center relative gap-8">
+    <div className="text-center space-y-4">
+      <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto border border-primary/20">
+        <ArrowRight className="text-primary" size={40} />
       </div>
-      <div className="flex gap-4">
-        <Globe className="text-white/40 hover:text-primary transition-colors cursor-pointer" size={24} onClick={() => toast.info('App disponível em todo o Triângulo Mineiro!')} />
-        <HelpCircle className="text-white/40 hover:text-primary transition-colors cursor-pointer" size={24} onClick={() => toast.info('Iniciando chat de suporte...')} />
-        <Share2 className="text-white/40 hover:text-primary transition-colors cursor-pointer" size={24} onClick={async () => {
-          if (navigator.share) {
-            try {
-              await navigator.share({ title: 'UaiTrampo', text: 'Encontre os melhores prestadores de serviço!', url: window.location.href });
-            } catch (err) { console.error(err); }
-          } else {
-            navigator.clipboard.writeText(window.location.href);
-            toast.success('Link copiado pro seu zap!');
-          }
-        }} />
-      </div>
+      <h2 className="text-4xl font-bold text-white tracking-tight">Bem-vindo ao <span className="text-primary">UaiTrampo</span></h2>
+      <p className="text-white/60 text-sm max-w-[280px]">O jeito mais mineiro de resolver seus problemas de casa.</p>
     </div>
 
-    <div className="z-10 mt-12">
-      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-        <h2 className="text-6xl font-black text-white italic tracking-tighter leading-[0.8] mb-4">
-          O TREM QUE <br />
-          <span className="text-primary not-italic">RESOLVE</span> <br />
-          PRA VOCÊ.
-        </h2>
-        <p className="text-white/40 text-lg font-medium max-w-[280px] leading-snug">
-          Encontre os melhores profissionais de Minas num vapt-vupt.
-        </p>
-      </motion.div>
-    </div>
-
-    <div className="flex flex-col gap-4 z-10">
+    <div className="w-full max-w-xs space-y-4">
       <button 
         onClick={() => onNext('register')}
-        className="w-full bg-primary py-6 rounded-3xl font-black text-background-dark flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/20 group"
+        className="w-full bg-primary py-4 rounded-2xl font-bold text-background-dark hover:opacity-90 transition-all shadow-lg"
       >
-        BORA COMEÇAR?
-        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+        Entrar na Conta
       </button>
       
       <button 
@@ -66,93 +38,117 @@ export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void
           toast.success('Entrando como visitante...');
           onVisitor();
         }}
-        className="w-full bg-white/5 border border-white/10 py-6 rounded-3xl font-bold text-white hover:bg-white/10 transition-all backdrop-blur-md"
+        className="w-full bg-white/5 border border-white/10 py-4 rounded-2xl font-bold text-white hover:bg-white/10 transition-all"
       >
         Continuar como visitante
       </button>
 
-      <div className="flex justify-center gap-8 mt-4">
-        <button onClick={() => onNext('login-prompt')} className="text-primary/60 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors">Entrar na conta</button>
-        <button className="text-white/20 text-xs font-bold uppercase tracking-widest hover:text-white/40 transition-colors" onClick={() => toast.info('Abra os termos de uso')}>Termos de Uso</button>
-        <button className="text-white/20 text-xs font-bold uppercase tracking-widest hover:text-white/40 transition-colors" onClick={() => toast.info('Abra a política de privacidade')}>Privacidade</button>
+      <div className="flex justify-center gap-6 pt-4 text-white/40">
+        <Globe size={20} className="hover:text-primary cursor-pointer" onClick={() => toast.info('Disponível em Minas Gerais')} />
+        <HelpCircle size={20} className="hover:text-primary cursor-pointer" onClick={() => toast.info('Suporte')} />
+        <Share2 size={20} className="hover:text-primary cursor-pointer" onClick={() => toast.info('Compartilhar')} />
       </div>
     </div>
   </div>
 );
 
-export const RegisterScreen = ({ onNext }: { onNext: (s: Screen) => void }) => (
-  <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-center">
-    <div className="mb-12">
-      <h2 className="text-5xl font-black text-white italic tracking-tighter leading-none mb-4">CADASTRO <br /><span className="text-primary">VAPT-VUPT</span></h2>
-      <p className="text-white/40">Coloca seu número aí embaixo, sô!</p>
-    </div>
-    
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-4">Seu Celular</label>
-        <input 
-          type="tel" 
-          placeholder="(34) 99999-9999" 
-          className="w-full bg-white/5 border border-white/10 p-6 rounded-3xl text-white font-bold outline-none focus:border-primary focus:bg-primary/5 transition-all text-xl"
-        />
+export const RegisterScreen = ({ onNext }: { onNext: (s: Screen) => void }) => {
+  const [step, setStep] = useState(1);
+  return (
+    <div className="min-h-screen bg-background-dark p-8">
+      <div className="flex items-center gap-4 mb-12">
+        <button onClick={() => onNext('login')} className="p-2 bg-white/5 rounded-xl border border-white/10">
+          <ArrowRight className="rotate-180 text-white/40" size={24} />
+        </button>
+        <h2 className="text-2xl font-bold text-white">Criar Conta</h2>
       </div>
 
-      <button 
-        onClick={() => onNext('verify')}
-        className="w-full bg-primary py-6 rounded-3xl font-black text-background-dark flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/20"
-      >
-        MANDAR CÓDIGO
-        <ArrowRight size={20} />
-      </button>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1">Nome Completo</label>
+          <div className="relative">
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+            <input type="text" placeholder="Como ocê chama?" className="w-full bg-white/5 border border-white/10 p-4 pl-12 rounded-2xl text-white outline-none focus:border-primary transition-all" />
+          </div>
+        </div>
 
-      <button onClick={() => onNext('login')} className="w-full text-white/40 text-xs font-bold uppercase tracking-widest hover:text-white">Arredar pro início</button>
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1">E-mail</label>
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+            <input type="email" placeholder="seuemail@exemplo.com" className="w-full bg-white/5 border border-white/10 p-4 pl-12 rounded-2xl text-white outline-none focus:border-primary transition-all" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1">Senha</label>
+          <div className="relative">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+            <input type="password" placeholder="••••••••" className="w-full bg-white/5 border border-white/10 p-4 pl-12 rounded-2xl text-white outline-none focus:border-primary transition-all" />
+          </div>
+        </div>
+
+        <button 
+          onClick={() => onNext('verify')}
+          className="w-full bg-primary py-4 rounded-2xl font-bold text-background-dark mt-8"
+        >
+          Cadastrar
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const VerificationScreen = ({ onVerify }: { onVerify: () => void }) => (
-  <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-center">
-    <div className="mb-12">
-      <h2 className="text-5xl font-black text-white italic tracking-tighter leading-none mb-4">CONFIRMA <br /><span className="text-primary">PRA NÓIS</span></h2>
-      <p className="text-white/40">Chegou um código aí no seu zap.</p>
+  <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-center items-center text-center gap-8">
+    <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20">
+      <Mail className="text-emerald-500" size={48} />
     </div>
     
-    <div className="space-y-8 text-center">
-      <div className="flex justify-between gap-4">
-        {[1,2,3,4].map(i => (
-          <input 
-            key={i}
-            type="text" 
-            maxLength={1}
-            className="w-full bg-white/5 border border-white/10 p-6 rounded-2xl text-white font-black text-3xl text-center outline-none focus:border-primary transition-all"
-          />
-        ))}
-      </div>
+    <div className="space-y-4">
+      <h2 className="text-3xl font-bold text-white">Quase lá, sô!</h2>
+      <p className="text-white/60 text-sm max-w-[240px] mx-auto">
+        Mandamos um código pro seu e-mail. Dá uma olhada lá pra gente confirmar quem é ocê.
+      </p>
+    </div>
 
+    <div className="flex gap-3">
+      {[1, 2, 3, 4].map((i) => (
+        <input key={i} type="text" maxLength={1} className="w-14 h-16 bg-white/5 border border-white/10 rounded-2xl text-center text-2xl font-bold text-white outline-none focus:border-primary transition-all" />
+      ))}
+    </div>
+
+    <div className="w-full space-y-4">
       <button 
         onClick={() => {
-          toast.success('Perfil verificado com sucesso!');
+          toast.success('Pode entrar, a casa é sua!');
           onVerify();
         }}
-        className="w-full bg-primary py-6 rounded-3xl font-black text-background-dark flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/20"
+        className="w-full bg-primary py-4 rounded-2xl font-bold text-background-dark flex items-center justify-center gap-2"
       >
         VERIFICAR AGORA
         <CheckCircle2 size={20} />
       </button>
-
-      <button className="text-white/40 text-xs font-bold uppercase tracking-widest hover:text-white" onClick={() => toast.success('Código reenviado!')}>Mandar de novo, uai!</button>
+      <button onClick={() => toast.info('Mandamos de novo!')} className="text-white/40 text-sm font-bold hover:text-white transition-colors">Mandar de novo, uai!</button>
     </div>
   </div>
 );
 
-export const LoginPromptScreen = ({ onBack, onLogin }: { onBack: () => void, onLogin: (isAdmin: boolean) => void }) => {
+export const LoginPromptScreen = ({ 
+  onBack, 
+  onLogin 
+}: { 
+  onBack: () => void, 
+  onLogin: (admin: boolean) => void 
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPass, setShowPass] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email === 'uaitrampo34@gmail.com' && password === 'Davi2602') {
-      toast.success('Bem-vindo de volta, Mestre Davi!', { icon: '👑' });
+      toast.success('Bem-vindo mestre Davi!', { icon: '👑' });
       onLogin(true);
     } else {
       toast.success('Login realizado com sucesso!');
@@ -161,46 +157,63 @@ export const LoginPromptScreen = ({ onBack, onLogin }: { onBack: () => void, onL
   };
 
   return (
-    <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-center">
-      <div className="mb-12">
-        <h2 className="text-5xl font-black text-white italic tracking-tighter leading-none mb-4">ENTRE <br /><span className="text-primary">NA CONTA</span></h2>
-        <p className="text-white/40">Que bom te ver de volta!</p>
+    <div className="min-h-screen bg-background-dark p-8">
+      <div className="flex items-center gap-4 mb-12">
+        <button onClick={onBack} className="p-2 bg-white/5 rounded-xl border border-white/10">
+          <ArrowRight className="rotate-180 text-white/40" size={24} />
+        </button>
+        <h2 className="text-2xl font-bold text-white">Entrar</h2>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-4">E-mail</label>
-          <input 
-            type="email" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="uai@exemplo.com" 
-            className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-bold outline-none focus:border-primary transition-all"
-            required
-          />
+          <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1">Seu E-mail</label>
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+            <input 
+              type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seuemail@exemplo.com" 
+              className="w-full bg-white/5 border border-white/10 p-4 pl-12 rounded-2xl text-white outline-none focus:border-primary transition-all"
+              required 
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-4">Senha</label>
-          <input 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••" 
-            className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-bold outline-none focus:border-primary transition-all"
-            required
-          />
+          <label className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1">Sua Senha</label>
+          <div className="relative">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+            <input 
+              type={showPass ? 'text' : 'password'} 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••" 
+              className="w-full bg-white/5 border border-white/10 p-4 pl-12 pr-12 rounded-2xl text-white outline-none focus:border-primary transition-all"
+              required 
+            />
+            <button 
+              type="button"
+              onClick={() => setShowPass(!showPass)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white"
+            >
+              {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
         <button 
           type="submit"
-          className="w-full bg-primary py-6 rounded-3xl font-black text-background-dark flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/20"
+          className="w-full bg-primary py-4 rounded-2xl font-bold text-background-dark shadow-lg shadow-primary/20"
         >
-          LOGAR AGORA
-          <LogIn size={20} />
+          Entrar na Conta
         </button>
-
-        <button type="button" onClick={onBack} className="w-full text-white/40 text-xs font-bold uppercase tracking-widest hover:text-white">Voltar pro início</button>
+        
+        <div className="flex flex-col gap-4 text-center pt-4">
+          <button type="button" onClick={() => toast.info('Enviamos instruções pro seu e-mail')} className="text-white/40 text-xs font-bold hover:text-white">Esqueceu o trem da senha?</button>
+          <button type="button" onClick={() => toast.info('Abrindo termos...')} className="text-[10px] text-white/20 leading-relaxed px-4">Ao entrar, você concorda com nossos <span className="text-white/40 font-bold decoration-dotted">Termos de Uso</span> e <span className="text-white/40 font-bold decoration-dotted">Privacidade</span>.</button>
+        </div>
       </form>
     </div>
   );
