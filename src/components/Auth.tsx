@@ -73,7 +73,7 @@ export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void
         </button>
         <button
           onClick={() => {
-            navigator.clipboard.writeText('https://uaitrampo.vercel.app/');
+            navigator.clipboard.writeText('https://uai-trampo.vercel.app');
             toast.success('Link do app copiado! Manda pros amigos.');
           }}
           className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 hover:text-primary hover:border-primary/50 transition-all active:scale-90"
