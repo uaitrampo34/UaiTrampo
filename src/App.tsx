@@ -38,27 +38,6 @@ export default function App() {
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2000);
-
-    // Verifica avaliação pendente da última vinda
-    const pending = localStorage.getItem('pending_evaluation');
-    if (pending) {
-      const { name } = JSON.parse(pending);
-      setTimeout(() => {
-        toast('E aí, o serviço foi bão?', {
-          description: `Como foi o atendimento com ${name}?`,
-          action: {
-            label: 'Avaliar Agora',
-            onClick: () => {
-              toast.success('Abre tela de avaliação (Em breve!)');
-              localStorage.removeItem('pending_evaluation');
-            }
-          },
-          onDismiss: () => localStorage.removeItem('pending_evaluation'),
-          duration: 10000,
-        });
-      }, 3000); // 3seg após o splash
-    }
-
     return () => clearTimeout(timer);
   }, []);
 

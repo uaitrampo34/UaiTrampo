@@ -94,58 +94,111 @@ export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void
   </div>
 );
 
-export const RegisterScreen = ({ onNext }: { onNext: (s: Screen) => void }) => (
-  <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden flex flex-col">
-    <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-primary/10 rounded-full blur-[120px]" />
+export const RegisterScreen = ({ onNext }: { onNext: (s: Screen) => void }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    <div className="relative z-10 flex flex-col flex-1">
-      <div className="flex items-center justify-between mt-4 mb-12">
-        <button onClick={() => onNext('login')} className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 active:scale-90 transition-transform">
-          <ArrowRight className="rotate-180" size={24} strokeWidth={3} />
-        </button>
-        <div className="h-1 w-12 bg-white/10 rounded-full" />
-      </div>
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !email || !password) return toast.error('Preencha os campos tudo, sô!');
 
-      <div className="space-y-4 mb-12">
-        <h2 className="text-5xl font-black text-white italic tracking-tighter leading-tight">NOVO <br /><span className="text-primary not-italic text-4xl">CADASTRO</span></h2>
-        <p className="text-white/40 text-sm font-bold">Vem cô nóis, que o trem é bão demais!</p>
-      </div>
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name }
+      }
+    });
 
-      <div className="space-y-10 flex-1">
-        {[
-          { icon: User, label: 'COMO OCÊ CHAMA?', placeholder: 'Nome Completo' },
-          { icon: Mail, label: 'QUAL SEU E-MAIL?', placeholder: 'seu@email.com' },
-          { icon: Lock, label: 'CRIA UMA SENHA', placeholder: '••••••••' },
-        ].map((f, i) => (
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: i * 0.1 }}
-            key={f.label}
-            className="space-y-4"
-          >
-            <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">{f.label}</label>
+    setLoading(false);
+    if (error) {
+      toast.error('Erro ao cadastrar, dá uma olhada:', { description: error.message });
+      return;
+    }
+
+    toast.success('Quase lá! Agora confirma seu e-mail.');
+    onNext('verify');
+  };
+
+  return (
+    <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden flex flex-col">
+      <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-primary/10 rounded-full blur-[120px]" />
+
+      <div className="relative z-10 flex flex-col flex-1">
+        <div className="flex items-center justify-between mt-4 mb-12">
+          <button onClick={() => onNext('login')} className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 active:scale-90 transition-transform">
+            <ArrowRight className="rotate-180" size={24} strokeWidth={3} />
+          </button>
+          <div className="h-1 w-12 bg-white/10 rounded-full" />
+        </div>
+
+        <div className="space-y-4 mb-12">
+          <h2 className="text-5xl font-black text-white italic tracking-tighter leading-tight">NOVO <br /><span className="text-primary not-italic text-4xl">CADASTRO</span></h2>
+          <p className="text-white/40 text-sm font-bold">Vem cô nóis, que o trem é bão demais!</p>
+        </div>
+
+        <form onSubmit={handleRegister} className="space-y-10 flex-1">
+          <div className="space-y-4">
+            <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">COMO OCÊ CHAMA?</label>
             <div className="relative group">
-              <f.icon className="absolute left-0 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
+              <User className="absolute left-0 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
               <input
-                type={f.label.includes('SENHA') ? 'password' : 'text'}
-                placeholder={f.placeholder}
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nome Completo"
                 className="w-full bg-transparent border-b-2 border-white/5 py-4 pl-10 text-xl font-bold text-white outline-none focus:border-primary transition-all placeholder:text-white/10"
+                required
               />
             </div>
-          </motion.div>
-        ))}
-      </div>
+          </div>
 
-      <button
-        onClick={() => onNext('verify')}
-        className="w-full bg-primary text-background-dark py-6 rounded-[30px] font-black text-xl hover:scale-[1.02] transition-transform active:scale-95 shadow-2xl shadow-primary/20 mb-8"
-      >
-        CADASTRAR AGORA
-      </button>
+          <div className="space-y-4">
+            <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">QUAL SEU E-MAIL?</label>
+            <div className="relative group">
+              <Mail className="absolute left-0 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="seu@email.com"
+                className="w-full bg-transparent border-b-2 border-white/5 py-4 pl-10 text-xl font-bold text-white outline-none focus:border-primary transition-all placeholder:text-white/10"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">CRIA UMA SENHA</label>
+            <div className="relative group">
+              <Lock className="absolute left-0 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-transparent border-b-2 border-white/5 py-4 pl-10 text-xl font-bold text-white outline-none focus:border-primary transition-all placeholder:text-white/10"
+                required
+                minLength={6}
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-8 bg-primary text-background-dark py-6 rounded-[30px] font-black text-xl hover:scale-[1.02] transition-transform active:scale-95 shadow-2xl shadow-primary/20 disabled:opacity-50"
+          >
+            {loading ? 'CADASTRANDO...' : 'CADASTRAR AGORA'}
+          </button>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const VerificationScreen = ({ onVerify }: { onVerify: () => void }) => (
   <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-center gap-12 text-center relative overflow-hidden">
@@ -159,37 +212,27 @@ export const VerificationScreen = ({ onVerify }: { onVerify: () => void }) => (
         </div>
       </div>
       <div className="space-y-2">
-        <h2 className="text-5xl font-black text-white italic tracking-tighter">CONFIRMA <br /><span className="text-primary not-italic text-3xl">O CÓDIGO!</span></h2>
-        <p className="text-white/40 text-sm font-bold max-w-[200px] mx-auto">Mandamos um trem pro seu e-mail pra confirmar que é ocê.</p>
+        <h2 className="text-5xl font-black text-white italic tracking-tighter">OLHA O <br /><span className="text-primary not-italic text-3xl">E-MAIL!</span></h2>
+        <p className="text-white/40 text-sm font-bold max-w-[200px] mx-auto">Mandamos um link de confirmação pro seu e-mail. Clica lá pra ativar sua conta!</p>
       </div>
     </div>
 
-    <div className="flex justify-between gap-4 relative z-10">
-      {[1, 2, 3, 4].map((i) => (
-        <motion.input
-          key={i}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: i * 0.1 }}
-          type="text"
-          maxLength={1}
-          className="w-16 h-20 bg-white/5 border-2 border-white/5 rounded-3xl text-center text-3xl font-black text-primary outline-none focus:border-primary focus:bg-primary/5 transition-all shadow-xl"
-        />
-      ))}
-    </div>
+    <div className="relative z-10 space-y-6">
+      <div className="p-6 bg-white/5 border border-white/10 rounded-[40px] backdrop-blur-md">
+        <p className="text-xs font-bold text-white/60 uppercase tracking-widest leading-relaxed">
+          Após clicar no link do e-mail, ocê já vai tá logado e pronto pro trabalho!
+        </p>
+      </div>
 
-    <div className="relative z-10 space-y-4">
       <button
         onClick={() => {
-          toast.success('Pode entrar, a casa é sua!');
-          onVerify();
+          toast.info('Voltando para o início...');
+          window.location.reload();
         }}
-        className="w-full bg-primary text-background-dark py-6 rounded-[30px] font-black text-xl flex items-center justify-center gap-3 active:scale-95 transition-transform"
+        className="w-full bg-white/5 border border-white/10 py-6 rounded-[30px] font-black text-white hover:bg-white/10 transition-all flex items-center justify-center"
       >
-        FECHAR O ACORDO
-        <CheckCircle2 size={24} strokeWidth={3} />
+        VOLTAR PARA O LOGIN
       </button>
-      <button onClick={() => toast.info('Mandamos de novo!')} className="text-white/20 text-xs font-black uppercase tracking-widest hover:text-white transition-colors">Mandar o trem de novo!</button>
     </div>
   </div>
 );
@@ -291,7 +334,18 @@ export const LoginPromptScreen = ({
             ENTRAR NO TREM
           </button>
 
-          <button type="button" onClick={() => toast.info('Enviamos instruções!')} className="w-full text-white/20 text-xs font-black uppercase tracking-widest hover:text-white transition-colors">ESQUECEU O TREM DA SENHA?</button>
+          <button
+            type="button"
+            onClick={async () => {
+              if (!email) return toast.error('Digita seu e-mail primeiro, sô!');
+              const { error } = await supabase.auth.resetPasswordForEmail(email);
+              if (error) toast.error('Erro ao enviar trem: ' + error.message);
+              else toast.success('Enviamos as instruções pro seu e-mail!');
+            }}
+            className="w-full text-white/20 text-xs font-black uppercase tracking-widest hover:text-white transition-colors"
+          >
+            ESQUECEU O TREM DA SENHA?
+          </button>
         </form>
       </div>
     </div>

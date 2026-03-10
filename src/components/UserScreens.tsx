@@ -57,15 +57,11 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
           <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">{isAdmin ? 'admin@uaitrampo.com' : 'usuario@uaitrampo.com'}</p>
         </div>
 
-        {!isAdmin && (
+        {isAdmin && (
           <div className="flex gap-4 w-full pt-4">
-            <div className="flex-1 bg-white/5 border border-white/10 p-4 rounded-3xl text-center">
-              <p className="text-primary text-xl font-black">12</p>
-              <p className="text-[10px] text-white/20 font-bold uppercase text-center leading-none">TREMS<br />CADASTRADOS</p>
-            </div>
-            <div className="flex-1 bg-white/5 border border-white/10 p-4 rounded-3xl text-center">
-              <p className="text-primary text-xl font-black">4.9</p>
-              <div className="flex justify-center"><Star className="text-primary fill-primary" size={10} /></div>
+            <div className="flex-1 bg-white/5 border border-white/10 p-6 rounded-3xl text-center">
+              <p className="text-primary text-2xl font-black">12</p>
+              <p className="text-[10px] text-white/20 font-bold uppercase text-center leading-none tracking-widest mt-1">TREMS CADASTRADOS</p>
             </div>
           </div>
         )}
@@ -105,18 +101,20 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
         <h3 className="text-xs font-black text-white/20 uppercase tracking-[0.3em]">NAVEGAÇÃO</h3>
       </div>
 
-      <button
-        onClick={() => toast.info('Histórico de serviços')}
-        className="w-full bg-white/5 border border-white/10 p-6 rounded-[35px] flex items-center justify-between group hover:bg-white/10 transition-all active:scale-95"
-      >
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-primary transition-all group-hover:rotate-12">
-            <MessageCircle className="text-white/40 group-hover:text-background-dark" size={20} />
+      {isAdmin && (
+        <button
+          onClick={() => toast.info('Histórico de serviços')}
+          className="w-full bg-white/5 border border-white/10 p-6 rounded-[35px] flex items-center justify-between group hover:bg-white/10 transition-all active:scale-95"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-primary transition-all group-hover:rotate-12">
+              <MessageCircle className="text-white/40 group-hover:text-background-dark" size={20} />
+            </div>
+            <span className="text-white font-black text-[12px] uppercase tracking-widest">MEUS SERVIÇOS</span>
           </div>
-          <span className="text-white font-black text-[12px] uppercase tracking-widest">MEUS SERVIÇOS</span>
-        </div>
-        <ChevronRight size={20} className="text-white/20 group-hover:translate-x-2 transition-transform" />
-      </button>
+          <ChevronRight size={20} className="text-white/20 group-hover:translate-x-2 transition-transform" />
+        </button>
+      )}
 
       <button
         onClick={async () => {

@@ -135,12 +135,6 @@ export const HomeScreen = ({
     const message = encodeURIComponent(`Olá ${name}! Vi seu perfil no UaiTrampo e gostaria de um orçamento, sô!`);
 
     window.open(`https://wa.me/${finalPhone}?text=${message}`, '_blank');
-
-    // Armazena para avaliação futura (Próximo login/abertura do app)
-    localStorage.setItem('pending_evaluation', JSON.stringify({
-      name,
-      date: new Date().toISOString()
-    }));
   };
 
   return (
