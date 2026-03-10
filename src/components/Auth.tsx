@@ -32,7 +32,7 @@ export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void
       >
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 rounded-full border border-primary/30">
           <Sparkles className="text-primary" size={12} />
-          <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">O tremor das Gerais</span>
+          <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">A FORÇA DO TRABALHO MINEIRO</span>
         </div>
         <h2 className="text-6xl font-black text-white italic tracking-tighter leading-[0.9]">BEM-VINDO <br /><span className="text-primary not-italic">AO TREM!</span></h2>
         <p className="text-white/40 text-sm font-bold max-w-[240px]">O jeito mais prático e mineiro de resolver as coisa da sua casa.</p>
