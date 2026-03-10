@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   ArrowRight,
-  Globe,
+  Instagram,
   Hammer,
   HelpCircle,
   Share2,
@@ -59,11 +59,34 @@ export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void
       </div>
 
       <div className="flex justify-center gap-8 pt-4">
-        {[Globe, HelpCircle, Share2].map((Icon, i) => (
-          <button key={i} className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 hover:text-primary hover:border-primary/50 transition-all active:scale-90">
-            <Icon size={20} />
-          </button>
-        ))}
+        <button
+          onClick={() => window.open('https://www.instagram.com/uaitrampo34/', '_blank')}
+          className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 hover:text-primary hover:border-primary/50 transition-all active:scale-90"
+        >
+          <Instagram size={20} />
+        </button>
+        <button
+          onClick={() => window.open('https://wa.me/5534996506860?text=Opa! Preciso de uma ajuda aqui no UaiTrampo.', '_blank')}
+          className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 hover:text-primary hover:border-primary/50 transition-all active:scale-90"
+        >
+          <HelpCircle size={20} />
+        </button>
+        <button
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: 'UaiTrampo',
+                text: 'Encontre os melhores prestadores de serviço de Minas no UaiTrampo!',
+                url: window.location.href
+              }).catch(() => toast.error('Não deu pra compartilhar agora.'));
+            } else {
+              toast.success('Link copiado! Manda pros amigos.');
+            }
+          }}
+          className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 hover:text-primary hover:border-primary/50 transition-all active:scale-90"
+        >
+          <Share2 size={20} />
+        </button>
       </div>
     </div>
   </div>
