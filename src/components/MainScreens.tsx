@@ -1,37 +1,104 @@
 import React from 'react';
-import { 
-  Search, 
-  Star, 
-  Trash2, 
-  Hammer, 
-  Paintbrush, 
-  PlugZap, 
-  ShieldCheck, 
-  Truck, 
+import {
+  Search,
+  Star,
+  Trash2,
+  Hammer,
+  Paintbrush,
+  PlugZap,
+  ShieldCheck,
+  Truck,
   Clock,
   Sparkles,
-  MessageCircle
+  MessageCircle,
+  ArrowRight
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
+import { useState } from 'react';
 import { Provider } from '../types';
 import { CategoryCard, Header } from './Common';
 
-export const HomeScreen = ({ 
-  providers, 
-  isAdmin, 
+const PortfolioCarousel = ({ images }: { images: string[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const next = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  return (
+    <div className="relative w-full max-w-sm aspect-[4/5] mt-12 group">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentIndex}
+          initial={{ opacity: 0, x: 20, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: -20, scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="w-full h-full rounded-[50px] overflow-hidden border-4 border-white/10 shadow-2xl shadow-black/50"
+        >
+          <img
+            src={images[currentIndex]}
+            alt={`Foto ${currentIndex + 1}`}
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation Arrows */}
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={prev}
+            className="absolute -left-4 top-1/2 -translate-y-1/2 p-4 bg-black/50 border border-white/10 rounded-full text-white backdrop-blur-md active:scale-90 transition-transform shadow-xl z-20"
+          >
+            <ArrowRight className="rotate-180" size={20} strokeWidth={3} />
+          </button>
+          <button
+            onClick={next}
+            className="absolute -right-4 top-1/2 -translate-y-1/2 p-4 bg-black/50 border border-white/10 rounded-full text-white backdrop-blur-md active:scale-90 transition-transform shadow-xl z-20"
+          >
+            <ArrowRight size={20} strokeWidth={3} />
+          </button>
+
+          {/* Indicators */}
+          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex gap-2">
+            {images.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-8 bg-primary' : 'w-2 bg-white/20'}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+export const HomeScreen = ({
+  providers,
+  isAdmin,
   isVisitor,
-  onDelete, 
+  onDelete,
   onProfile,
   onLoginRequired
-}: { 
-  providers: Provider[], 
-  isAdmin: boolean, 
+}: {
+  providers: Provider[],
+  isAdmin: boolean,
   isVisitor: boolean,
   onDelete: (id: string) => void,
   onProfile: () => void,
   onLoginRequired: () => void
 }) => {
+  const [selectedPortfolio, setSelectedPortfolio] = useState<Provider | null>(null);
+
   const handleContact = (name: string) => {
     if (isVisitor) {
       toast.error('Opa! Precisa logar primeiro, sô.', {
@@ -60,7 +127,7 @@ export const HomeScreen = ({
   return (
     <div className="pb-40">
       <Header onProfile={onProfile} />
-      
+
       <div className="p-8">
         <div className="flex flex-col gap-2 mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full w-fit border border-primary/20">
@@ -78,17 +145,18 @@ export const HomeScreen = ({
           <CategoryCard icon={<ShieldCheck />} label="Câmeras" onClick={() => toast.info('Filtrando Câmeras')} />
         </div>
 
-        <div className="grid gap-6 mt-4">
+        <div className="grid gap-6 mt-4 pb-20">
           {providers.map((p, idx) => (
-            <motion.div 
+            <motion.div
               layout
               initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
-              key={p.id} 
-              className="bg-white/5 border border-white/10 p-6 rounded-[40px] flex items-center gap-6 hover:bg-white/10 transition-all group relative backdrop-blur-md"
+              key={p.id}
+              onClick={() => p.portfolio && p.portfolio.length > 0 && setSelectedPortfolio(p)}
+              className={`bg-white/5 border border-white/10 p-6 rounded-[40px] flex items-center gap-6 hover:bg-white/10 transition-all group relative backdrop-blur-md ${p.portfolio && p.portfolio.length > 0 ? 'cursor-pointer active:scale-98' : ''}`}
             >
               {isAdmin && (
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onDelete(p.id);
@@ -98,9 +166,14 @@ export const HomeScreen = ({
                   <Trash2 size={18} />
                 </button>
               )}
-              
-              <div className="w-24 h-24 rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all">
-                <img src={p.img} alt={p.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+
+              <div className="w-24 h-24 rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all relative">
+                <img src={p.profile_img} alt={p.name} className="w-full h-full object-cover transition-all duration-700" />
+                {p.portfolio && p.portfolio.length > 0 && (
+                  <div className="absolute bottom-1 right-1 bg-primary text-background-dark text-[8px] font-black px-1.5 py-0.5 rounded-lg shadow-lg">
+                    +{p.portfolio.length} FOTOS
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 space-y-2">
@@ -110,8 +183,8 @@ export const HomeScreen = ({
                 </div>
                 <h3 className="font-black text-white text-xl tracking-tight leading-none group-hover:text-primary transition-colors">{p.name}</h3>
                 <p className="text-white/40 text-xs font-bold uppercase tracking-widest">{p.role}</p>
-                
-                <button 
+
+                <button
                   onClick={() => handleContact(p.name)}
                   className="w-full mt-4 bg-white text-background-dark py-4 rounded-2xl font-black text-[10px] tracking-[0.2em] hover:bg-primary transition-all active:scale-90 flex items-center justify-center gap-2 group/btn"
                 >
@@ -123,6 +196,36 @@ export const HomeScreen = ({
           ))}
         </div>
       </div>
+
+      <AnimatePresence>
+        {selectedPortfolio && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center p-6 backdrop-blur-xl"
+          >
+            <div className="absolute top-8 left-8 right-8 flex items-center justify-between z-10">
+              <div className="space-y-1">
+                <h3 className="text-primary font-black text-[10px] uppercase tracking-[0.3em]">PORTFÓLIO</h3>
+                <p className="text-white font-black text-2xl italic tracking-tighter">{selectedPortfolio.name}</p>
+              </div>
+              <button
+                onClick={() => setSelectedPortfolio(null)}
+                className="p-4 bg-white/10 rounded-2xl border border-white/10 text-white active:scale-90 transition-transform backdrop-blur-md"
+              >
+                <ArrowRight size={24} className="rotate-180" />
+              </button>
+            </div>
+
+            <PortfolioCarousel images={selectedPortfolio.portfolio} />
+
+            <div className="absolute bottom-10 text-[8px] font-black text-white/20 uppercase tracking-[1em]">
+              TREM DESLIZANTE
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -130,16 +233,16 @@ export const HomeScreen = ({
 export const ExploreScreen = () => (
   <div className="min-h-screen bg-background-dark p-8 pb-40 relative">
     <div className="absolute top-1/4 -right-20 w-80 h-80 bg-primary/5 rounded-full blur-[120px]" />
-    
+
     <div className="relative z-10">
       <h2 className="text-5xl font-black text-white italic tracking-tighter leading-tight mb-10 mt-4">ENCONTRE O <br /><span className="text-primary not-italic text-4xl">PROFISSIONAL</span></h2>
-      
+
       <div className="relative mb-12 group">
         <div className="absolute inset-0 bg-primary/5 blur-2xl group-focus-within:bg-primary/10 transition-colors" />
         <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
-        <input 
-          type="text" 
-          placeholder="O que ocê precisa, sô?" 
+        <input
+          type="text"
+          placeholder="O que ocê precisa, sô?"
           className="w-full bg-white/5 border border-white/10 p-6 pl-16 rounded-[30px] text-white font-bold outline-none focus:border-primary transition-all backdrop-blur-xl"
         />
       </div>
@@ -159,10 +262,10 @@ export const ExploreScreen = () => (
             transition={{ delay: i * 0.05 }}
             key={cat.label}
           >
-            <CategoryCard 
-              icon={cat.icon} 
-              label={cat.label} 
-              onClick={() => toast.info(`Explorando ${cat.label}`)} 
+            <CategoryCard
+              icon={cat.icon}
+              label={cat.label}
+              onClick={() => toast.info(`Explorando ${cat.label}`)}
             />
           </motion.div>
         ))}

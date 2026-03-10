@@ -17,6 +17,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { Screen } from '../types';
+import { supabase } from '../supabaseClient';
 
 export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void, onVisitor: () => void }) => (
   <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-end relative overflow-hidden">
@@ -45,6 +46,14 @@ export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void
         >
           CRIAR MINHA CONTA
           <ArrowRight className="group-hover:translate-x-2 transition-transform" size={24} strokeWidth={3} />
+        </button>
+
+        <button
+          onClick={() => onNext('login-prompt')}
+          className="w-full bg-primary text-background-dark py-6 rounded-[30px] font-black text-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-3 group active:scale-95 shadow-2xl shadow-primary/20"
+        >
+          JÁ TENHO CONTA (ENTRAR)
+          <Lock className="group-hover:rotate-12 transition-transform" size={20} strokeWidth={3} />
         </button>
 
         <button
@@ -196,14 +205,30 @@ export const LoginPromptScreen = ({
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === 'uaitrampo34@gmail.com' && password === 'Davi2602') {
-      toast.success('Bão demais ter ocê aqui, Mestre Davi!', { icon: '👑' });
-      onLogin(true);
-    } else {
-      toast.success('Login no capricho!');
-      onLogin(false);
+    if (!email || !password) return toast.error('Preencha os campos tudo, sô!');
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast.error('Erro no login, confere os dados aí!', { description: error.message });
+      console.error(error);
+      return;
+    }
+
+    if (data.user) {
+      // Check if it's the master email we defined
+      const isAdmin = email === 'uaitrampo34@gmail.com';
+      if (isAdmin) {
+        toast.success('Bão demais ter ocê aqui, Mestre DEV!', { icon: '👑' });
+      } else {
+        toast.success('Login no capricho!');
+      }
+      onLogin(isAdmin);
     }
   };
 

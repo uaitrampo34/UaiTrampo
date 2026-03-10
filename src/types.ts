@@ -1,12 +1,12 @@
-export type Screen = 
-  | 'login' 
-  | 'register' 
-  | 'verify' 
-  | 'home' 
-  | 'explore' 
-  | 'profile' 
-  | 'settings' 
-  | 'login-prompt' 
+export type Screen =
+  | 'login'
+  | 'register'
+  | 'verify'
+  | 'home'
+  | 'explore'
+  | 'profile'
+  | 'settings'
+  | 'login-prompt'
   | 'add-provider';
 
 export interface Provider {
@@ -14,6 +14,7 @@ export interface Provider {
   name: string;
   role: string;
   reviews: number;
-  img: string;
+  profile_img: string;
+  portfolio: string[];
   created_at?: string;
 }

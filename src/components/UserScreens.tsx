@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
-import { 
-  ArrowRight, 
-  Settings as SettingsIcon, 
-  MessageCircle, 
-  ChevronRight, 
-  LogOut, 
-  Bell, 
-  Shield, 
-  UserPlus, 
-  Users, 
-  History, 
+import {
+  ArrowRight,
+  Settings as SettingsIcon,
+  MessageCircle,
+  ChevronRight,
+  LogOut,
+  Bell,
+  Shield,
+  UserPlus,
+  Users,
+  History,
   Camera,
   RefreshCw,
   Sparkles,
   Zap,
-  Star
+  Star,
+  Trash2
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 import { Screen, Provider } from '../types';
+import { supabase } from '../supabaseClient';
 
 export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (s: Screen) => void }) => (
   <div className="min-h-screen bg-background-dark p-8 pb-40">
@@ -27,7 +29,7 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
         <div className="h-1 w-8 bg-primary rounded-full" />
         <h2 className="text-4xl font-black text-white italic tracking-tighter">MEU <span className="text-primary not-italic">PERFIL</span></h2>
       </div>
-      <button 
+      <button
         onClick={() => onNext('settings')}
         className="p-4 bg-white/5 rounded-3xl border border-white/10 text-white/40 active:scale-90 transition-transform"
       >
@@ -41,29 +43,31 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
       <div className="relative bg-white/5 border border-white/10 p-8 rounded-[40px] flex flex-col items-center gap-6 backdrop-blur-xl">
         <div className="relative">
           <div className="w-28 h-28 rounded-[35px] bg-primary flex items-center justify-center border-4 border-background-dark shadow-2xl overflow-hidden group-hover:rotate-6 transition-transform">
-            <span className="text-background-dark text-5xl font-black">D</span>
+            <span className="text-background-dark text-4xl font-black">{isAdmin ? 'DEV' : 'U'}</span>
           </div>
           {isAdmin && (
             <div className="absolute -top-3 -right-3 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full border-2 border-background-dark shadow-xl animate-bounce">
-              MESTRE DAVI
+              MESTRE DEV
             </div>
           )}
         </div>
         <div className="text-center">
-          <h3 className="text-3xl font-black text-white tracking-tight">Davi Reis</h3>
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">davi.reis@uaitrampo.com</p>
+          <h3 className="text-3xl font-black text-white tracking-tight">{isAdmin ? 'DEV' : 'Usuário'}</h3>
+          <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">{isAdmin ? 'admin@uaitrampo.com' : 'usuario@uaitrampo.com'}</p>
         </div>
-        
-        <div className="flex gap-4 w-full pt-4">
-          <div className="flex-1 bg-white/5 border border-white/10 p-4 rounded-3xl text-center">
-            <p className="text-primary text-xl font-black">12</p>
-            <p className="text-[10px] text-white/20 font-bold uppercase">TREMS</p>
+
+        {!isAdmin && (
+          <div className="flex gap-4 w-full pt-4">
+            <div className="flex-1 bg-white/5 border border-white/10 p-4 rounded-3xl text-center">
+              <p className="text-primary text-xl font-black">12</p>
+              <p className="text-[10px] text-white/20 font-bold uppercase">TREMS</p>
+            </div>
+            <div className="flex-1 bg-white/5 border border-white/10 p-4 rounded-3xl text-center">
+              <p className="text-primary text-xl font-black">4.9</p>
+              <div className="flex justify-center"><Star className="text-primary fill-primary" size={10} /></div>
+            </div>
           </div>
-          <div className="flex-1 bg-white/5 border border-white/10 p-4 rounded-3xl text-center">
-            <p className="text-primary text-xl font-black">4.9</p>
-            <div className="flex justify-center"><Star className="text-primary fill-primary" size={10} /></div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
 
@@ -74,7 +78,7 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
           <h3 className="text-xs font-black text-primary uppercase tracking-[0.3em]">COMANDOS DO MESTRE</h3>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <button 
+          <button
             onClick={() => onNext('add-provider')}
             className="p-6 bg-primary/20 border-2 border-primary/30 rounded-[35px] flex flex-col items-start gap-4 hover:bg-primary transition-all group/btn active:scale-95"
           >
@@ -83,7 +87,7 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
             </div>
             <span className="text-xs font-black text-primary group-hover:text-background-dark uppercase tracking-widest leading-tight">NOVO <br />PRESTADOR</span>
           </button>
-          
+
           <button className="p-6 bg-white/5 border border-white/10 rounded-[35px] flex flex-col items-start gap-4 opacity-40 grayscale group hover:opacity-100 transition-all cursor-not-allowed">
             <div className="p-3 bg-white/5 rounded-2xl">
               <Users className="text-white/40 group-hover:text-white" size={24} />
@@ -99,8 +103,8 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
         <Sparkles className="text-white/20" size={16} />
         <h3 className="text-xs font-black text-white/20 uppercase tracking-[0.3em]">NAVEGAÇÃO</h3>
       </div>
-      
-      <button 
+
+      <button
         onClick={() => toast.info('Histórico de serviços')}
         className="w-full bg-white/5 border border-white/10 p-6 rounded-[35px] flex items-center justify-between group hover:bg-white/10 transition-all active:scale-95"
       >
@@ -113,8 +117,9 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
         <ChevronRight size={20} className="text-white/20 group-hover:translate-x-2 transition-transform" />
       </button>
 
-      <button 
-        onClick={() => {
+      <button
+        onClick={async () => {
+          await supabase.auth.signOut();
           toast.success('Até mais ver, sô! Volta logo pro trem!');
           setTimeout(() => window.location.reload(), 1500);
         }}
@@ -130,10 +135,10 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
 export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
   <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden">
     <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px]" />
-    
+
     <div className="relative z-10">
       <div className="flex items-center gap-6 mt-4 mb-16">
-        <button 
+        <button
           onClick={onBack}
           className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 active:scale-90 transition-transform"
         >
@@ -153,9 +158,9 @@ export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
               { icon: Bell, label: "Notificações", sub: "Alertas de novos serviços" },
               { icon: Shield, label: "Privacidade", sub: "Quem pode ver seus trens" }
             ].map((item, i, arr) => (
-              <div 
+              <div
                 key={item.label}
-                onClick={() => toast.info(item.label)} 
+                onClick={() => toast.info(item.label)}
                 className={`p-6 flex items-center justify-between hover:bg-white/5 cursor-pointer group transition-colors ${i !== arr.length - 1 ? 'border-b border-white/5' : ''}`}
               >
                 <div className="flex items-center gap-4">
@@ -173,7 +178,7 @@ export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
           </div>
         </div>
 
-        <button 
+        <button
           onClick={() => toast.success('Chamando o pessoal do suporte!')}
           className="w-full bg-white text-background-dark font-black py-6 rounded-[35px] hover:bg-primary transition-all shadow-2xl shadow-white/5 flex items-center justify-center gap-3 group active:scale-95"
         >
@@ -185,63 +190,157 @@ export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
   </div>
 );
 
-export const AddProviderScreen = ({ 
-  onBack, 
-  onAdd 
-}: { 
-  onBack: () => void, 
-  onAdd: (p: Omit<Provider, 'id' | 'reviews'>) => void 
+export const AddProviderScreen = ({
+  onBack,
+  onAdd
+}: {
+  onBack: () => void,
+  onAdd: (p: Omit<Provider, 'id' | 'reviews'>) => void
 }) => {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
-  const [img, setImg] = useState('');
+  const [profileImg, setProfileImg] = useState('');
+  const [portfolio, setPortfolio] = useState<string[]>([]);
 
-  const generateRandomAvatar = () => {
+  const processImage = (base64Str: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const MAX_DIM = 1200;
+        if (width > height) {
+          if (width > MAX_DIM) {
+            height *= MAX_DIM / width;
+            width = MAX_DIM;
+          }
+        } else {
+          if (height > MAX_DIM) {
+            width *= MAX_DIM / height;
+            height = MAX_DIM;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+    });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, isProfile: boolean, index?: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) return toast.error('Foto muito pesada! Escolha uma menor, sô.');
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const compressed = await processImage(event.target?.result as string);
+      if (isProfile) setProfileImg(compressed);
+      else if (typeof index === 'number') {
+        const newPortfolio = [...portfolio];
+        newPortfolio[index] = compressed;
+        setPortfolio(newPortfolio);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const generateRandomAvatar = async (isProfile: boolean, index?: number) => {
     const randomId = Math.random().toString(36).substr(2, 9);
-    setImg(`https://i.pravatar.cc/150?u=${randomId}`);
-    toast.success('Imagem chique gerada!', { icon: '✨' });
+    const url = `https://i.pravatar.cc/300?u=${randomId}`;
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const compressed = await processImage(e.target?.result as string);
+        if (isProfile) setProfileImg(compressed);
+        else if (typeof index === 'number') {
+          const newPortfolio = [...portfolio];
+          newPortfolio[index] = compressed;
+          setPortfolio(newPortfolio);
+        }
+      };
+      reader.readAsDataURL(blob);
+      toast.success('Imagem chique gerada!', { icon: '✨' });
+    } catch (err) {
+      toast.error('Erro ao buscar imagem aleatória.');
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !role) return toast.error('Preencha os campos tudo, sô!');
-    onAdd({ name, role, img: img || `https://i.pravatar.cc/150?u=${name}` });
+    if (!profileImg) return toast.error('Coloca uma foto de perfil pelo menos, uai!');
+    onAdd({
+      name,
+      role,
+      profile_img: profileImg,
+      portfolio: portfolio.filter(img => !!img)
+    });
   };
 
   return (
     <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden flex flex-col">
       <div className="absolute -top-20 -left-20 w-80 h-80 bg-primary/10 rounded-full blur-[120px]" />
-      
-      <div className="relative z-10 flex flex-col flex-1">
+
+      <div className="relative z-10 flex flex-col flex-1 pb-10">
         <div className="flex items-center gap-6 mt-4 mb-12">
-          <button 
-            onClick={onBack}
-            className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 active:scale-90 transition-transform"
-          >
+          <button onClick={onBack} className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 active:scale-90 transition-transform">
             <ArrowRight className="rotate-180" size={24} strokeWidth={3} />
           </button>
           <h2 className="text-4xl font-black text-white italic tracking-tighter leading-none">NOVO <br /><span className="text-primary not-italic text-3xl">PRESTADOR</span></h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-10 flex-1">
-          <div className="flex flex-col items-center gap-6 group">
+          <div className="flex flex-col items-center gap-4 group">
             <div className="relative">
               <div className="w-32 h-32 rounded-[40px] bg-white/5 border-4 border-dashed border-white/10 flex items-center justify-center overflow-hidden group-hover:border-primary transition-all">
-                {img ? (
-                  <img src={img} alt="Preview" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                {profileImg ? (
+                  <img src={profileImg} alt="Preview" className="w-full h-full object-cover transition-all duration-700" />
                 ) : (
                   <Camera size={32} className="text-white/10 group-hover:text-primary transition-colors" />
                 )}
+                <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, true)} className="absolute inset-0 opacity-0 cursor-pointer" />
               </div>
-              <button 
+              <button
                 type="button"
-                onClick={generateRandomAvatar}
-                className="absolute -bottom-2 -right-2 bg-primary p-4 rounded-3xl shadow-2xl active:scale-90 transition-transform"
+                onClick={() => generateRandomAvatar(true)}
+                className="absolute -bottom-2 -right-2 bg-primary p-4 rounded-3xl shadow-2xl active:scale-90 transition-transform z-10"
               >
                 <RefreshCw size={20} className="text-background-dark font-bold" strokeWidth={3} />
               </button>
             </div>
-            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">FOTO DO PROFISSIONAL</span>
+            <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">FOTO DE PERFIL</span>
+          </div>
+
+          <div className="space-y-4">
+            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] ml-1">PORTFÓLIO (ATÉ 4 FOTOS)</span>
+            <div className="grid grid-cols-4 gap-3">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="relative aspect-square rounded-2xl bg-white/5 border-2 border-dashed border-white/5 flex items-center justify-center overflow-hidden hover:border-primary/50 transition-colors">
+                  {portfolio[i] ? (
+                    <img src={portfolio[i]} alt={`Portfolio ${i}`} className="w-full h-full object-cover" />
+                  ) : (
+                    <Sparkles size={16} className="text-white/5" />
+                  )}
+                  <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, false, i)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  {portfolio[i] && (
+                    <button type="button" onClick={() => {
+                      const newPortfolio = [...portfolio];
+                      newPortfolio[i] = '';
+                      setPortfolio(newPortfolio);
+                    }} className="absolute top-1 right-1 bg-red-500/80 p-1.5 rounded-lg text-white backdrop-blur-sm">
+                      <Trash2 size={12} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-10">
@@ -251,11 +350,11 @@ export const AddProviderScreen = ({
             ].map((f) => (
               <div key={f.label} className="space-y-4">
                 <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">{f.label}</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={f.value}
                   onChange={(e) => f.setter(e.target.value)}
-                  placeholder={f.placeholder} 
+                  placeholder={f.placeholder}
                   className="w-full bg-transparent border-b-2 border-white/5 py-4 text-xl font-bold text-white outline-none focus:border-primary transition-all placeholder:text-white/10"
                   required
                 />
@@ -264,11 +363,8 @@ export const AddProviderScreen = ({
           </div>
 
           <div className="pt-8 flex flex-col gap-4">
-            <button 
-              type="submit"
-              className="w-full bg-primary text-background-dark py-6 rounded-[35px] font-black text-xl active:scale-95 shadow-22xl shadow-primary/30"
-            >
-              CADASTRAR PRESTADOR
+            <button type="submit" className="w-full bg-primary text-background-dark py-6 rounded-[35px] font-black text-xl active:scale-95 shadow-22xl shadow-primary/30">
+              CADASTRAR TUDO
             </button>
             <button type="button" onClick={onBack} className="w-full py-2 text-white/20 text-xs font-black uppercase tracking-widest hover:text-white transition-colors">CANCELAR OPERAÇÃO</button>
           </div>

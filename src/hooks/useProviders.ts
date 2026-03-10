@@ -43,10 +43,11 @@ export const useProviders = () => {
     const { data, error } = await supabase
       .from('providers')
       .insert([
-        { 
-          name: newP.name, 
-          role: newP.role, 
-          img: newP.img,
+        {
+          name: newP.name,
+          role: newP.role,
+          profile_img: newP.profile_img,
+          portfolio: newP.portfolio || [],
           reviews: 0
         }
       ])
