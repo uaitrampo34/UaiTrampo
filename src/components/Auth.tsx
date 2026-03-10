@@ -35,7 +35,7 @@ export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void
           <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">A FORÇA DO TRABALHO MINEIRO</span>
         </div>
         <h2 className="text-6xl font-black text-white italic tracking-tighter leading-[0.9]">BEM-VINDO <br /><span className="text-primary not-italic">AO TREM!</span></h2>
-        <p className="text-white/40 text-sm font-bold max-w-[240px]">O jeito mais prático e mineiro de resolver as coisa da sua casa.</p>
+        <p className="text-white/40 text-sm font-bold max-w-[240px]">Aqui resolvemos seus problemas num vapti-vupti.</p>
       </motion.div>
 
       <div className="space-y-3">
