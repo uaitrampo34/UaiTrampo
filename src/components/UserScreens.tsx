@@ -15,7 +15,8 @@ import {
   Sparkles,
   Zap,
   Star,
-  Trash2
+  Trash2,
+  MapPin
 } from 'lucide-react';
 import { CATEGORIES } from './Common';
 import { motion } from 'motion/react';
@@ -23,113 +24,252 @@ import { toast } from 'sonner';
 import { Screen, Provider } from '../types';
 import { supabase } from '../supabaseClient';
 
-export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (s: Screen) => void }) => (
-  <div className="min-h-screen bg-background-dark p-8 pb-40">
-    <div className="flex items-center justify-between mb-12 mt-4">
-      <div className="space-y-1">
-        <div className="h-1 w-8 bg-primary rounded-full" />
-        <h2 className="text-4xl font-black text-white italic tracking-tighter">MEU <span className="text-primary not-italic">PERFIL</span></h2>
-      </div>
-      <button
-        onClick={() => onNext('settings')}
-        className="p-4 bg-white/5 rounded-3xl border border-white/10 text-white/40 active:scale-90 transition-transform"
-      >
-        <SettingsIcon size={24} />
-      </button>
-    </div>
+export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (s: Screen) => void }) => {
+  const [user, setUser] = useState<any>(null);
 
-    {/* Premium Profile Card */}
-    <div className="relative group mb-12">
-      <div className="absolute inset-0 bg-primary/10 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
-      <div className="relative bg-white/5 border border-white/10 p-8 rounded-[40px] flex flex-col items-center gap-6 backdrop-blur-xl">
-        <div className="relative">
-          <div className="w-28 h-28 rounded-[35px] bg-primary flex items-center justify-center border-4 border-background-dark shadow-2xl overflow-hidden group-hover:rotate-6 transition-transform">
-            <span className="text-background-dark text-4xl font-black">{isAdmin ? 'DEV' : 'U'}</span>
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+  }, []);
+
+  const displayName = user?.user_metadata?.full_name || (isAdmin ? 'MESTRE DEV' : 'Usuário');
+  const displayEmail = user?.email || (isAdmin ? 'admin@uaitrampo.com' : 'usuario@uaitrampo.com');
+
+  return (
+    <div className="min-h-screen bg-background-dark p-8 pb-40">
+      <div className="flex items-center justify-between mb-12 mt-4">
+        <div className="space-y-1">
+          <div className="h-1 w-8 bg-primary rounded-full" />
+          <h2 className="text-4xl font-black text-white italic tracking-tighter">MEU <span className="text-primary not-italic">PERFIL</span></h2>
+        </div>
+        <button
+          onClick={() => onNext('settings')}
+          className="p-4 bg-white/5 rounded-3xl border border-white/10 text-white/40 active:scale-90 transition-transform"
+        >
+          <SettingsIcon size={24} />
+        </button>
+      </div>
+
+      {/* Premium Profile Card */}
+      <div className="relative group mb-12">
+        <div className="absolute inset-0 bg-primary/10 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
+        <div className="relative bg-white/5 border border-white/10 p-8 rounded-[40px] flex flex-col items-center gap-6 backdrop-blur-xl">
+          <div className="relative">
+            <div className="w-28 h-28 rounded-[35px] bg-primary flex items-center justify-center border-4 border-background-dark shadow-2xl overflow-hidden group-hover:rotate-6 transition-transform">
+              <span className="text-background-dark text-4xl font-black">{isAdmin ? 'DEV' : (displayName[0] || 'U')}</span>
+            </div>
+            {isAdmin && (
+              <div className="absolute -top-3 -right-3 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full border-2 border-background-dark shadow-xl animate-bounce">
+                MESTRE DEV
+              </div>
+            )}
           </div>
+          <div className="text-center">
+            <h3 className="text-3xl font-black text-white tracking-tight">{displayName}</h3>
+            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">{displayEmail}</p>
+          </div>
+
           {isAdmin && (
-            <div className="absolute -top-3 -right-3 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full border-2 border-background-dark shadow-xl animate-bounce">
-              MESTRE DEV
+            <div className="flex gap-4 w-full pt-4">
+              <div className="flex-1 bg-white/5 border border-white/10 p-6 rounded-3xl text-center">
+                <p className="text-primary text-2xl font-black">12</p>
+                <p className="text-[10px] text-white/20 font-bold uppercase text-center leading-none tracking-widest mt-1">TREMS CADASTRADOS</p>
+              </div>
             </div>
           )}
         </div>
-        <div className="text-center">
-          <h3 className="text-3xl font-black text-white tracking-tight">{isAdmin ? 'DEV' : 'Usuário'}</h3>
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">{isAdmin ? 'admin@uaitrampo.com' : 'usuario@uaitrampo.com'}</p>
-        </div>
-
-        {isAdmin && (
-          <div className="flex gap-4 w-full pt-4">
-            <div className="flex-1 bg-white/5 border border-white/10 p-6 rounded-3xl text-center">
-              <p className="text-primary text-2xl font-black">12</p>
-              <p className="text-[10px] text-white/20 font-bold uppercase text-center leading-none tracking-widest mt-1">TREMS CADASTRADOS</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-
-    {isAdmin && (
-      <div className="mb-12 space-y-6">
-        <div className="flex items-center gap-3 ml-2">
-          <Zap className="text-primary" size={16} />
-          <h3 className="text-xs font-black text-primary uppercase tracking-[0.3em]">COMANDOS DO MESTRE</h3>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            onClick={() => onNext('add-provider')}
-            className="p-6 bg-primary/20 border-2 border-primary/30 rounded-[35px] flex flex-col items-start gap-4 hover:bg-primary transition-all group/btn active:scale-95"
-          >
-            <div className="p-3 bg-primary/20 rounded-2xl group-hover/btn:bg-white/20 transition-colors">
-              <UserPlus className="text-primary group-hover/btn:text-background-dark" size={24} />
-            </div>
-            <span className="text-xs font-black text-primary group-hover:text-background-dark uppercase tracking-widest leading-tight">NOVO <br />PRESTADOR</span>
-          </button>
-
-          <button className="p-6 bg-white/5 border border-white/10 rounded-[35px] flex flex-col items-start gap-4 opacity-40 grayscale group hover:opacity-100 transition-all cursor-not-allowed">
-            <div className="p-3 bg-white/5 rounded-2xl">
-              <Users className="text-white/40 group-hover:text-white" size={24} />
-            </div>
-            <span className="text-xs font-black text-white/40 group-hover:text-white uppercase tracking-widest leading-tight">GESTÃO <br />USUÁRIOS</span>
-          </button>
-        </div>
-      </div>
-    )}
-
-    <div className="space-y-4">
-      <div className="flex items-center gap-3 ml-2">
-        <Sparkles className="text-white/20" size={16} />
-        <h3 className="text-xs font-black text-white/20 uppercase tracking-[0.3em]">NAVEGAÇÃO</h3>
       </div>
 
-      {isAdmin && (
+      {!isAdmin && (
         <button
-          onClick={() => toast.info('Histórico de serviços')}
-          className="w-full bg-white/5 border border-white/10 p-6 rounded-[35px] flex items-center justify-between group hover:bg-white/10 transition-all active:scale-95"
+          onClick={() => onNext('edit-profile')}
+          className="w-full bg-white/5 border border-white/10 py-6 rounded-[30px] font-black text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95 mb-12"
         >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-primary transition-all group-hover:rotate-12">
-              <MessageCircle className="text-white/40 group-hover:text-background-dark" size={20} />
-            </div>
-            <span className="text-white font-black text-[12px] uppercase tracking-widest">MEUS SERVIÇOS</span>
-          </div>
-          <ChevronRight size={20} className="text-white/20 group-hover:translate-x-2 transition-transform" />
+          EDITAR MEU PERFIL
         </button>
       )}
 
-      <button
-        onClick={async () => {
-          await supabase.auth.signOut();
-          toast.success('Até mais ver, sô! Volta logo pro trem!');
-          setTimeout(() => window.location.reload(), 1500);
-        }}
-        className="w-full py-8 text-red-500 font-black text-[10px] uppercase tracking-[0.3em] hover:bg-red-500/10 rounded-[35px] transition-all flex items-center justify-center gap-3 mt-8 border-2 border-red-500/10"
-      >
-        <LogOut size={20} />
-        ARREDAR O PÉ (Sair)
-      </button>
+      {isAdmin && (
+        <div className="mb-12 space-y-6">
+          <div className="flex items-center gap-3 ml-2">
+            <Zap className="text-primary" size={16} />
+            <h3 className="text-xs font-black text-primary uppercase tracking-[0.3em]">COMANDOS DO MESTRE</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => onNext('add-provider')}
+              className="p-6 bg-primary/20 border-2 border-primary/30 rounded-[35px] flex flex-col items-start gap-4 hover:bg-primary transition-all group/btn active:scale-95"
+            >
+              <div className="p-3 bg-primary/20 rounded-2xl group-hover/btn:bg-white/20 transition-colors">
+                <UserPlus className="text-primary group-hover/btn:text-background-dark" size={24} />
+              </div>
+              <span className="text-xs font-black text-primary group-hover:text-background-dark uppercase tracking-widest leading-tight">NOVO <br />PRESTADOR</span>
+            </button>
+
+            <button className="p-6 bg-white/5 border border-white/10 rounded-[35px] flex flex-col items-start gap-4 opacity-40 grayscale group hover:opacity-100 transition-all cursor-not-allowed">
+              <div className="p-3 bg-white/5 rounded-2xl">
+                <Users className="text-white/40 group-hover:text-white" size={24} />
+              </div>
+              <span className="text-xs font-black text-white/40 group-hover:text-white uppercase tracking-widest leading-tight">GESTÃO <br />USUÁRIOS</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 ml-2">
+          <Sparkles className="text-white/20" size={16} />
+          <h3 className="text-xs font-black text-white/20 uppercase tracking-[0.3em]">NAVEGAÇÃO</h3>
+        </div>
+
+        {isAdmin && (
+          <button
+            onClick={() => toast.info('Histórico de serviços')}
+            className="w-full bg-white/5 border border-white/10 p-6 rounded-[35px] flex items-center justify-between group hover:bg-white/10 transition-all active:scale-95"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-primary transition-all group-hover:rotate-12">
+                <MessageCircle className="text-white/40 group-hover:text-background-dark" size={20} />
+              </div>
+              <span className="text-white font-black text-[12px] uppercase tracking-widest">MEUS SERVIÇOS</span>
+            </div>
+            <ChevronRight size={20} className="text-white/20 group-hover:translate-x-2 transition-transform" />
+          </button>
+        )}
+
+        <button
+          onClick={async () => {
+            await supabase.auth.signOut();
+            toast.success('Até mais ver, sô! Volta logo pro trem!');
+            setTimeout(() => window.location.reload(), 1500);
+          }}
+          className="w-full py-8 text-red-500 font-black text-[10px] uppercase tracking-[0.3em] hover:bg-red-500/10 rounded-[35px] transition-all flex items-center justify-center gap-3 mt-8 border-2 border-red-500/10"
+        >
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+export const EditUserProfileScreen = ({
+  onBack,
+  onUpdate
+}: {
+  onBack: () => void,
+  onUpdate: (data: { name?: string, phone?: string, address?: string }) => void
+}) => {
+  const [user, setUser] = useState<any>(null);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user);
+        setName(user.user_metadata?.full_name || '');
+        setPhone(user.user_metadata?.phone || '');
+        setAddress(user.user_metadata?.address || '');
+      }
+    });
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        full_name: name,
+        phone,
+        address
+      }
+    });
+
+    setLoading(false);
+    if (error) {
+      toast.error('Erro ao salvar seus dados, sô!', { description: error.message });
+      return;
+    }
+
+    toast.success('Perfil atualizado com sucesso! Chique demais.');
+    onUpdate({ name, phone, address });
+  };
+
+  return (
+    <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden flex flex-col">
+      <div className="absolute -top-20 -left-20 w-80 h-80 bg-primary/10 rounded-full blur-[120px]" />
+
+      <div className="relative z-10 flex flex-col flex-1 pb-10">
+        <div className="flex items-center gap-6 mt-4 mb-12">
+          <button onClick={onBack} className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 active:scale-90 transition-transform">
+            <ArrowRight className="rotate-180" size={24} strokeWidth={3} />
+          </button>
+          <h2 className="text-4xl font-black text-white italic tracking-tighter leading-none">EDITAR MEU <br /><span className="text-primary not-italic text-3xl">PERFIL</span></h2>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-12 flex-1">
+          <div className="space-y-10">
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">COMO OCÊ CHAMA?</label>
+              <div className="relative group">
+                <User className="absolute left-0 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Seu nome completo"
+                  className="w-full bg-transparent border-b-2 border-white/5 py-4 pl-10 text-xl font-bold text-white outline-none focus:border-primary transition-all placeholder:text-white/10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">INSTAGRAM OU ZAP (OPCIONAL)</label>
+              <div className="relative group">
+                <MessageCircle className="absolute left-0 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Seu contato"
+                  className="w-full bg-transparent border-b-2 border-white/5 py-4 pl-10 text-xl font-bold text-white outline-none focus:border-primary transition-all placeholder:text-white/10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">SEU ENDEREÇO (OPCIONAL)</label>
+              <div className="relative group">
+                <MapPin className="absolute left-0 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Para sabermos de onde ocê é"
+                  className="w-full bg-transparent border-b-2 border-white/5 py-4 pl-10 text-xl font-bold text-white outline-none focus:border-primary transition-all placeholder:text-white/10"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-8 flex flex-col gap-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary text-background-dark py-6 rounded-[35px] font-black text-xl active:scale-95 shadow-2xl shadow-primary/30 disabled:opacity-50"
+            >
+              {loading ? 'SALVANDO TREM...' : 'SALVAR ALTERAÇÕES'}
+            </button>
+            <button type="button" onClick={onBack} className="w-full py-2 text-white/20 text-xs font-black uppercase tracking-widest hover:text-white transition-colors">VOLTAR</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
   <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden">

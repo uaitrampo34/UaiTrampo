@@ -18,7 +18,8 @@ import { HomeScreen, ExploreScreen } from './components/MainScreens';
 import {
   ProfileScreen,
   SettingsScreen,
-  AddProviderScreen
+  AddProviderScreen,
+  EditUserProfileScreen
 } from './components/UserScreens';
 
 export default function App() {
@@ -121,6 +122,13 @@ export default function App() {
             }}
             onAdd={handleSaveProvider}
             providerToEdit={editingProvider}
+          />
+        );
+      case 'edit-profile':
+        return (
+          <EditUserProfileScreen
+            onBack={() => setScreen('profile')}
+            onUpdate={() => setScreen('profile')}
           />
         );
       default:
