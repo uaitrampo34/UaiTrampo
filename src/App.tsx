@@ -8,17 +8,17 @@ import { useProviders } from './hooks/useProviders';
 
 // --- Components ---
 import { Splash, BottomNav } from './components/Common';
-import { 
-  LoginScreen, 
-  RegisterScreen, 
-  VerificationScreen, 
-  LoginPromptScreen 
+import {
+  LoginScreen,
+  RegisterScreen,
+  VerificationScreen,
+  LoginPromptScreen
 } from './components/Auth';
 import { HomeScreen, ExploreScreen } from './components/MainScreens';
-import { 
-  ProfileScreen, 
-  SettingsScreen, 
-  AddProviderScreen 
+import {
+  ProfileScreen,
+  SettingsScreen,
+  AddProviderScreen
 } from './components/UserScreens';
 
 export default function App() {
@@ -26,16 +26,39 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('login');
   const [isAdmin, setIsAdmin] = useState(false);
   const [isVisitor, setIsVisitor] = useState(false);
-  
-  const { 
-    providers, 
-    loading, 
-    deleteProvider, 
-    addProvider 
+  const [editingProvider, setEditingProvider] = useState<Provider | null>(null);
+
+  const {
+    providers,
+    loading,
+    deleteProvider,
+    addProvider,
+    updateProvider
   } = useProviders();
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2000);
+
+    // Verifica avaliação pendente da última vinda
+    const pending = localStorage.getItem('pending_evaluation');
+    if (pending) {
+      const { name } = JSON.parse(pending);
+      setTimeout(() => {
+        toast('E aí, o serviço foi bão?', {
+          description: `Como foi o atendimento com ${name}?`,
+          action: {
+            label: 'Avaliar Agora',
+            onClick: () => {
+              toast.success('Abre tela de avaliação (Em breve!)');
+              localStorage.removeItem('pending_evaluation');
+            }
+          },
+          onDismiss: () => localStorage.removeItem('pending_evaluation'),
+          duration: 10000,
+        });
+      }, 3000); // 3seg após o splash
+    }
+
     return () => clearTimeout(timer);
   }, []);
 
@@ -51,11 +74,24 @@ export default function App() {
     setScreen('home');
   };
 
-  const handleAddProvider = async (newP: Omit<Provider, 'id' | 'reviews'>) => {
-    const result = await addProvider(newP);
-    if (result) {
-      setScreen('home');
+  const handleSaveProvider = async (p: Omit<Provider, 'id' | 'reviews'>) => {
+    if (editingProvider) {
+      const result = await updateProvider(editingProvider.id, p);
+      if (result) {
+        setEditingProvider(null);
+        setScreen('home');
+      }
+    } else {
+      const result = await addProvider(p);
+      if (result) {
+        setScreen('home');
+      }
     }
+  };
+
+  const handleEditProvider = (p: Provider) => {
+    setEditingProvider(p);
+    setScreen('add-provider');
   };
 
   const renderScreen = () => {
@@ -71,34 +107,44 @@ export default function App() {
     }
 
     switch (screen) {
-      case 'login': 
+      case 'login':
         return <LoginScreen onNext={setScreen} onVisitor={handleVisitorAccess} />;
-      case 'register': 
+      case 'register':
         return <RegisterScreen onNext={setScreen} />;
-      case 'verify': 
+      case 'verify':
         return <VerificationScreen onVerify={() => setScreen('home')} />;
-      case 'login-prompt': 
+      case 'login-prompt':
         return <LoginPromptScreen onBack={() => setScreen('login')} onLogin={handleLogin} />;
-      case 'home': 
+      case 'home':
         return (
-          <HomeScreen 
-            providers={providers} 
-            isAdmin={isAdmin} 
+          <HomeScreen
+            providers={providers}
+            isAdmin={isAdmin}
             isVisitor={isVisitor}
-            onDelete={deleteProvider} 
-            onProfile={() => setScreen('profile')} 
+            onDelete={deleteProvider}
+            onEdit={handleEditProvider}
+            onProfile={() => setScreen('profile')}
             onLoginRequired={() => setScreen('login-prompt')}
           />
         );
-      case 'explore': 
+      case 'explore':
         return <ExploreScreen />;
-      case 'profile': 
+      case 'profile':
         return <ProfileScreen isAdmin={isAdmin} onNext={setScreen} />;
-      case 'settings': 
+      case 'settings':
         return <SettingsScreen onBack={() => setScreen('profile')} />;
-      case 'add-provider': 
-        return <AddProviderScreen onBack={() => setScreen('profile')} onAdd={handleAddProvider} />;
-      default: 
+      case 'add-provider':
+        return (
+          <AddProviderScreen
+            onBack={() => {
+              setEditingProvider(null);
+              setScreen('profile');
+            }}
+            onAdd={handleSaveProvider}
+            providerToEdit={editingProvider}
+          />
+        );
+      default:
         return <LoginScreen onNext={setScreen} onVisitor={handleVisitorAccess} />;
     }
   };
@@ -108,12 +154,12 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background-dark font-sans selection:bg-primary/30 text-white overflow-x-hidden">
       <Toaster position="top-center" expand={true} richColors closeButton theme="dark" />
-      
+
       <main className="max-w-md mx-auto min-h-screen relative shadow-2xl shadow-black/50 bg-background-dark">
         <AnimatePresence mode="wait">
           {renderScreen()}
         </AnimatePresence>
-        
+
         {['home', 'explore', 'profile'].includes(screen) && (
           <BottomNav screen={screen} setScreen={setScreen} />
         )}

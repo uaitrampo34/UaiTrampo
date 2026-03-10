@@ -16,5 +16,8 @@ export interface Provider {
   reviews: number;
   profile_img: string;
   portfolio: string[];
+  phone?: string;
+  category?: string;
+  address?: string;
   created_at?: string;
 }

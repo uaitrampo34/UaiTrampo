@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ArrowRight,
   Settings as SettingsIcon,
@@ -17,6 +17,7 @@ import {
   Star,
   Trash2
 } from 'lucide-react';
+import { CATEGORIES } from './Common';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 import { Screen, Provider } from '../types';
@@ -60,7 +61,7 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
           <div className="flex gap-4 w-full pt-4">
             <div className="flex-1 bg-white/5 border border-white/10 p-4 rounded-3xl text-center">
               <p className="text-primary text-xl font-black">12</p>
-              <p className="text-[10px] text-white/20 font-bold uppercase">TREMS</p>
+              <p className="text-[10px] text-white/20 font-bold uppercase text-center leading-none">TREMS<br />CADASTRADOS</p>
             </div>
             <div className="flex-1 bg-white/5 border border-white/10 p-4 rounded-3xl text-center">
               <p className="text-primary text-xl font-black">4.9</p>
@@ -192,15 +193,33 @@ export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
 
 export const AddProviderScreen = ({
   onBack,
-  onAdd
+  onAdd,
+  providerToEdit
 }: {
   onBack: () => void,
-  onAdd: (p: Omit<Provider, 'id' | 'reviews'>) => void
+  onAdd: (p: Omit<Provider, 'id' | 'reviews'>) => void,
+  providerToEdit: Provider | null
 }) => {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [profileImg, setProfileImg] = useState('');
   const [portfolio, setPortfolio] = useState<string[]>([]);
+  const [phone, setPhone] = useState('');
+  const [category, setCategory] = useState('');
+  const [address, setAddress] = useState('');
+
+  useEffect(() => {
+    if (providerToEdit) {
+      setName(providerToEdit.name);
+      setRole(providerToEdit.role);
+      setPhone(providerToEdit.phone || '');
+      setCategory(providerToEdit.category || '');
+      setAddress(providerToEdit.address || '');
+      setProfileImg(providerToEdit.profile_img);
+      setPortfolio(providerToEdit.portfolio);
+      setCategory(providerToEdit.category || '');
+    }
+  }, [providerToEdit]);
 
   const processImage = (base64Str: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -275,10 +294,14 @@ export const AddProviderScreen = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !role) return toast.error('Preencha os campos tudo, sô!');
+    if (!category) return toast.error('Escolha uma categoria pro trem, uai!');
     if (!profileImg) return toast.error('Coloca uma foto de perfil pelo menos, uai!');
     onAdd({
       name,
       role,
+      phone,
+      category,
+      address,
       profile_img: profileImg,
       portfolio: portfolio.filter(img => !!img)
     });
@@ -293,7 +316,7 @@ export const AddProviderScreen = ({
           <button onClick={onBack} className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 active:scale-90 transition-transform">
             <ArrowRight className="rotate-180" size={24} strokeWidth={3} />
           </button>
-          <h2 className="text-4xl font-black text-white italic tracking-tighter leading-none">NOVO <br /><span className="text-primary not-italic text-3xl">PRESTADOR</span></h2>
+          <h2 className="text-4xl font-black text-white italic tracking-tighter leading-none">{providerToEdit ? 'EDITAR' : 'NOVO'} <br /><span className="text-primary not-italic text-3xl">PRESTADOR</span></h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-10 flex-1">
@@ -343,10 +366,31 @@ export const AddProviderScreen = ({
             </div>
           </div>
 
+          <div className="space-y-4">
+            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] ml-1">CATEGORIA DO SERVIÇO</span>
+            <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 no-scrollbar">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCategory(cat.label)}
+                  className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all border ${category === cat.label
+                    ? 'bg-primary text-background-dark border-primary'
+                    : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'
+                    }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="space-y-10">
             {[
               { label: 'COMO O PROFISSIONAL CHAMA?', value: name, setter: setName, placeholder: 'Ex: Sebastião Silva' },
-              { label: 'QUAL A ESPECIALIDADE?', value: role, setter: setRole, placeholder: 'Ex: Eletricista de Primeira' }
+              { label: 'QUAL A ESPECIALIDADE?', value: role, setter: setRole, placeholder: 'Ex: Eletricista de Primeira' },
+              { label: 'WHATSAPP PARA CONTATO', value: phone, setter: setPhone, placeholder: 'Ex: 34996506860' },
+              { label: 'ENDEREÇO (OPCIONAL)', value: address, setter: setAddress, placeholder: 'Ex: Rua 12, nº 450, Centro' }
             ].map((f) => (
               <div key={f.label} className="space-y-4">
                 <label className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">{f.label}</label>
@@ -356,7 +400,7 @@ export const AddProviderScreen = ({
                   onChange={(e) => f.setter(e.target.value)}
                   placeholder={f.placeholder}
                   className="w-full bg-transparent border-b-2 border-white/5 py-4 text-xl font-bold text-white outline-none focus:border-primary transition-all placeholder:text-white/10"
-                  required
+                  required={f.label !== 'ENDEREÇO (OPCIONAL)'}
                 />
               </div>
             ))}
@@ -364,7 +408,7 @@ export const AddProviderScreen = ({
 
           <div className="pt-8 flex flex-col gap-4">
             <button type="submit" className="w-full bg-primary text-background-dark py-6 rounded-[35px] font-black text-xl active:scale-95 shadow-22xl shadow-primary/30">
-              CADASTRAR TUDO
+              {providerToEdit ? 'ATUALIZAR DADOS' : 'CADASTRAR TUDO'}
             </button>
             <button type="button" onClick={onBack} className="w-full py-2 text-white/20 text-xs font-black uppercase tracking-widest hover:text-white transition-colors">CANCELAR OPERAÇÃO</button>
           </div>

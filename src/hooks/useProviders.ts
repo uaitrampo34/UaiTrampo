@@ -48,6 +48,9 @@ export const useProviders = () => {
           role: newP.role,
           profile_img: newP.profile_img,
           portfolio: newP.portfolio || [],
+          phone: newP.phone,
+          category: newP.category,
+          address: newP.address,
           reviews: 0
         }
       ])
@@ -70,9 +73,40 @@ export const useProviders = () => {
     }
   };
 
+  const updateProvider = async (id: string, updates: Partial<Provider>) => {
+    const { data, error } = await supabase
+      .from('providers')
+      .update({
+        name: updates.name,
+        role: updates.role,
+        profile_img: updates.profile_img,
+        portfolio: updates.portfolio,
+        phone: updates.phone,
+        category: updates.category,
+        address: updates.address
+      })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      toast.error('Erro ao atualizar prestador no banco!');
+      console.error(error);
+      return null;
+    } else {
+      if (data && data[0]) {
+        setProviders(prev => prev.map(p => p.id === id ? data[0] : p));
+        toast.success('Perfil atualizado com sucesso!', {
+          icon: '✅'
+        });
+        return data[0];
+      }
+      return null;
+    }
+  };
+
   useEffect(() => {
     fetchProviders();
   }, []);
 
-  return { providers, loading, fetchProviders, deleteProvider, addProvider };
+  return { providers, loading, fetchProviders, deleteProvider, addProvider, updateProvider };
 };

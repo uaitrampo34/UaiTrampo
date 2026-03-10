@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Search,
   Star,
@@ -11,13 +11,24 @@ import {
   Clock,
   Sparkles,
   MessageCircle,
-  ArrowRight
+  ArrowRight,
+  Scissors,
+  Wrench,
+  Droplets,
+  HardHat,
+  Monitor,
+  Heart,
+  Car,
+  Dog,
+  Leaf,
+  Utensils,
+  Sun,
+  MapPin
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import { useState } from 'react';
 import { Provider } from '../types';
-import { CategoryCard, Header } from './Common';
+import { CategoryCard, Header, CATEGORIES } from './Common';
 
 const PortfolioCarousel = ({ images }: { images: string[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -87,6 +98,7 @@ export const HomeScreen = ({
   isAdmin,
   isVisitor,
   onDelete,
+  onEdit,
   onProfile,
   onLoginRequired
 }: {
@@ -94,10 +106,16 @@ export const HomeScreen = ({
   isAdmin: boolean,
   isVisitor: boolean,
   onDelete: (id: string) => void,
+  onEdit: (p: Provider) => void,
   onProfile: () => void,
   onLoginRequired: () => void
 }) => {
   const [selectedPortfolio, setSelectedPortfolio] = useState<Provider | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
+  const filteredProviders = activeFilter
+    ? providers.filter(p => p.category === activeFilter)
+    : providers;
 
   const handleContact = (name: string) => {
     if (isVisitor) {
@@ -109,19 +127,20 @@ export const HomeScreen = ({
     }
 
     toast.success('Abrindo WhatsApp do prestador...');
-    window.open('https://wa.me/5534996506860', '_blank');
+    const providerPhone = providers.find(p => p.name === name)?.phone || '5534996506860';
+    // Clean phone number (remove non-digits)
+    const cleanPhone = providerPhone.replace(/\D/g, '');
+    // Ensure it starts with 55 if length is 11 (standard BR mobile)
+    const finalPhone = cleanPhone.length === 11 ? `55${cleanPhone}` : cleanPhone;
+    const message = encodeURIComponent(`Olá ${name}! Vi seu perfil no UaiTrampo e gostaria de um orçamento, sô!`);
 
-    // Notificação de avaliação "Arroz com feijão"
-    setTimeout(() => {
-      toast('E aí, o serviço foi bão?', {
-        description: `Como foi o atendimento com ${name}?`,
-        action: {
-          label: 'Avaliar Agora',
-          onClick: () => toast.success('Abre tela de avaliação (Em breve!)')
-        },
-        duration: 10000,
-      });
-    }, 5000);
+    window.open(`https://wa.me/${finalPhone}?text=${message}`, '_blank');
+
+    // Armazena para avaliação futura (Próximo login/abertura do app)
+    localStorage.setItem('pending_evaluation', JSON.stringify({
+      name,
+      date: new Date().toISOString()
+    }));
   };
 
   return (
@@ -139,14 +158,25 @@ export const HomeScreen = ({
 
         {/* Horizontal Categories with "Wow" style */}
         <div className="flex gap-6 overflow-x-auto pb-8 -mx-8 px-8 no-scrollbar">
-          <CategoryCard icon={<Hammer />} label="Reparos" onClick={() => toast.info('Filtrando Reparos')} />
-          <CategoryCard icon={<Paintbrush />} label="Pintura" onClick={() => toast.info('Filtrando Pintura')} />
-          <CategoryCard icon={<PlugZap />} label="Elétrica" onClick={() => toast.info('Filtrando Elétrica')} />
-          <CategoryCard icon={<ShieldCheck />} label="Câmeras" onClick={() => toast.info('Filtrando Câmeras')} />
+          <CategoryCard
+            icon={<Sparkles />}
+            label="Ver Todos"
+            onClick={() => setActiveFilter(null)}
+            color={!activeFilter ? 'primary' : undefined}
+          />
+          {CATEGORIES.map((cat) => (
+            <CategoryCard
+              key={cat.id}
+              icon={cat.icon}
+              label={cat.label}
+              onClick={() => setActiveFilter(cat.label)}
+              color={activeFilter === cat.label ? 'primary' : undefined}
+            />
+          ))}
         </div>
 
         <div className="grid gap-6 mt-4 pb-20">
-          {providers.map((p, idx) => (
+          {filteredProviders.map((p, idx) => (
             <motion.div
               layout
               initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
@@ -156,15 +186,26 @@ export const HomeScreen = ({
               className={`bg-white/5 border border-white/10 p-6 rounded-[40px] flex items-center gap-6 hover:bg-white/10 transition-all group relative backdrop-blur-md ${p.portfolio && p.portfolio.length > 0 ? 'cursor-pointer active:scale-98' : ''}`}
             >
               {isAdmin && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(p.id);
-                  }}
-                  className="absolute top-4 right-4 p-3 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all z-10"
-                >
-                  <Trash2 size={18} />
-                </button>
+                <div className="absolute top-4 right-4 flex gap-2 z-10">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(p);
+                    }}
+                    className="p-3 bg-white/10 text-white rounded-2xl hover:bg-primary hover:text-background-dark transition-all"
+                  >
+                    <Wrench size={18} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(p.id);
+                    }}
+                    className="p-3 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               )}
 
               <div className="w-24 h-24 rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all relative">
@@ -184,11 +225,18 @@ export const HomeScreen = ({
                 <h3 className="font-black text-white text-xl tracking-tight leading-none group-hover:text-primary transition-colors">{p.name}</h3>
                 <p className="text-white/40 text-xs font-bold uppercase tracking-widest">{p.role}</p>
 
+                {p.address && (
+                  <div className="flex items-center gap-1.5 pt-1">
+                    <MapPin size={10} className="text-primary" />
+                    <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest truncate">{p.address}</span>
+                  </div>
+                )}
+
                 <button
                   onClick={() => handleContact(p.name)}
                   className="w-full mt-4 bg-white text-background-dark py-4 rounded-2xl font-black text-[10px] tracking-[0.2em] hover:bg-primary transition-all active:scale-90 flex items-center justify-center gap-2 group/btn"
                 >
-                  ACORDAR TREM
+                  MANDAR UM ZAP
                   <MessageCircle size={14} className="group-hover/btn:rotate-12 transition-transform" />
                 </button>
               </div>
@@ -249,12 +297,23 @@ export const ExploreScreen = () => (
 
       <div className="grid grid-cols-2 gap-4">
         {[
-          { icon: <Truck />, label: "Mudanças", color: "bg-purple-600" },
-          { icon: <Clock />, label: "Faxina", color: "bg-emerald-500" },
-          { icon: <Hammer />, label: "Obras", color: "bg-orange-500" },
-          { icon: <PlugZap />, label: "Ar-condicionado", color: "bg-sky-500" },
-          { icon: <Paintbrush />, label: "Pintura", color: "bg-pink-500" },
-          { icon: <ShieldCheck />, label: "Câmeras", color: "bg-blue-500" }
+          { icon: <HardHat />, label: "Construção Civil", color: "bg-orange-600" },
+          { icon: <Wrench />, label: "Marido de Aluguel", color: "bg-blue-600" },
+          { icon: <Scissors />, label: "Barbeiro & Salão", color: "bg-pink-600" },
+          { icon: <Leaf />, label: "Jardinagem", color: "bg-emerald-600" },
+          { icon: <PlugZap />, label: "Eletricista", color: "bg-yellow-600" },
+          { icon: <Droplets />, label: "Encanador", color: "bg-sky-600" },
+          { icon: <Truck />, label: "Fretes & Mudanças", color: "bg-purple-600" },
+          { icon: <Clock />, label: "Diarista & Faxina", color: "bg-teal-500" },
+          { icon: <Car />, label: "Mecânica Aut.", color: "bg-slate-600" },
+          { icon: <Dog />, label: "Pet Shop/Banho", color: "bg-amber-500" },
+          { icon: <HardHat />, label: "Pedreiro", color: "bg-stone-500" },
+          { icon: <Paintbrush />, label: "Pintor", color: "bg-indigo-500" },
+          { icon: <ShieldCheck />, label: "Segurança/Alarmes", color: "bg-rose-500" },
+          { icon: <Monitor />, label: "Informática", color: "bg-cyan-500" },
+          { icon: <Heart />, label: "Saúde & Estética", color: "bg-red-400" },
+          { icon: <Utensils />, label: "Cozinheiro/Buffet", color: "bg-lime-600" },
+          { icon: <Sun />, label: "Piscineiro", color: "bg-blue-400" }
         ].map((cat, i) => (
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}

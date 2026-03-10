@@ -5,7 +5,15 @@ import {
   Search,
   User as UserIcon,
   Star,
-  Zap
+  Zap,
+  HardHat,
+  Wrench,
+  Scissors,
+  Leaf,
+  Paintbrush,
+  PlugZap,
+  Droplets,
+  ShieldCheck
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Screen } from '../types';
@@ -56,7 +64,7 @@ export const Header = ({ onProfile }: { onProfile: () => void }) => (
       </div>
       <div>
         <h1 className="text-2xl font-black text-white italic tracking-tighter leading-none">Uai<span className="text-primary not-italic">Trampo</span></h1>
-        <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1">Minas Gerais, Uai!</p>
+        <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1">Resolvendo pepinos, descascando abacaxis!</p>
       </div>
     </div>
     <button
@@ -93,24 +101,42 @@ export const BottomNav = ({ screen, setScreen }: { screen: Screen, setScreen: (s
   </div>
 );
 
-export const CategoryCard = ({
+interface CategoryCardProps {
+  icon: React.ReactNode;
+  label: string;
+  color?: string;
+  onClick: () => void;
+}
+
+export const CategoryCard: React.FC<CategoryCardProps> = ({
   icon,
   label,
   color,
   onClick
-}: {
-  icon: React.ReactNode,
-  label: string,
-  color?: string,
-  onClick: () => void
 }) => (
   <button
     onClick={onClick}
     className="flex flex-col items-center gap-4 group min-w-[120px]"
   >
-    <div className={`w-20 h-20 rounded-[30px] flex items-center justify-center text-white shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 bg-white/5 border border-white/10 group-hover:bg-primary group-hover:text-background-dark group-hover:border-primary`}>
+    <div className={`w-20 h-20 rounded-[30px] flex items-center justify-center shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 border ${color === 'primary'
+      ? 'bg-primary text-background-dark border-primary'
+      : 'bg-white/5 text-white/40 border-white/10 group-hover:bg-primary group-hover:text-background-dark group-hover:border-primary'
+      }`}>
       {React.cloneElement(icon as React.ReactElement, { size: 32, strokeWidth: 2.5 })}
     </div>
-    <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] group-hover:text-primary transition-colors">{label}</span>
+    <span className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${color === 'primary' ? 'text-primary' : 'text-white/40 group-hover:text-primary'
+      }`}>{label}</span>
   </button>
 );
+
+export const CATEGORIES = [
+  { id: 'obras', label: 'Obras', icon: <HardHat /> },
+  { id: 'manutencao', label: 'Manutenção', icon: <Wrench /> },
+  { id: 'beleza', label: 'Beleza', icon: <Scissors /> },
+  { id: 'jardim', label: 'Jardim', icon: <Leaf /> },
+  { id: 'reparos', label: 'Reparos', icon: <HardHat /> },
+  { id: 'pintura', label: 'Pintura', icon: <Paintbrush /> },
+  { id: 'eletrica', label: 'Elétrica', icon: <PlugZap /> },
+  { id: 'hidraulica', label: 'Hidráulica', icon: <Droplets /> },
+  { id: 'seguranca', label: 'Segurança', icon: <ShieldCheck /> }
+];

@@ -35,8 +35,8 @@ export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void
           <Sparkles className="text-primary" size={12} />
           <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">A FORÇA DO TRABALHO MINEIRO</span>
         </div>
-        <h2 className="text-6xl font-black text-white italic tracking-tighter leading-[0.9]">BEM-VINDO <br /><span className="text-primary not-italic">AO TREM!</span></h2>
-        <p className="text-white/40 text-sm font-bold max-w-[240px]">Aqui resolvemos seus problemas num vapti-vupti.</p>
+        <h2 className="text-6xl font-black text-white italic tracking-tighter leading-[0.9]">BEM-VINDO <br /><span className="text-primary not-italic">AO NOSSO TREM!</span></h2>
+        <p className="text-white/40 text-sm font-bold">Vem cô nóis, que o trem é bão demais!</p>
       </motion.div>
 
       <div className="space-y-3">
@@ -224,9 +224,9 @@ export const LoginPromptScreen = ({
       // Check if it's the master email we defined
       const isAdmin = email === 'uaitrampo34@gmail.com';
       if (isAdmin) {
-        toast.success('Bão demais ter ocê aqui, Mestre DEV!', { icon: '👑' });
+        toast.success('Bem-vindo(a) de volta, Mestre DEV!', { icon: '👑' });
       } else {
-        toast.success('Login no capricho!');
+        toast.success('Login realizado com sucesso!');
       }
       onLogin(isAdmin);
     }
@@ -242,7 +242,7 @@ export const LoginPromptScreen = ({
         </button>
 
         <div className="space-y-4 mb-16">
-          <h2 className="text-5xl font-black text-white italic tracking-tighter leading-tight">ENTRAR NA <br /><span className="text-primary not-italic text-4xl">SUA CONTA</span></h2>
+          <h2 className="text-5xl font-black text-white italic tracking-tighter leading-tight">QUE BOM <br /><span className="text-primary not-italic text-4xl">VER VOCÊ!</span></h2>
           <p className="text-white/40 text-sm font-bold">Saudade d'ocê, sô!</p>
         </div>
 
