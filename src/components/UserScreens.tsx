@@ -16,7 +16,8 @@ import {
   Zap,
   Star,
   Trash2,
-  MapPin
+  MapPin,
+  User
 } from 'lucide-react';
 import { CATEGORIES } from './Common';
 import { motion } from 'motion/react';
