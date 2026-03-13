@@ -141,22 +141,18 @@ export const ProfileScreen = ({ isAdmin, isVisitor, onNext, providersCount }: { 
             <Zap className="text-primary" size={16} />
             <h3 className="text-xs font-black text-primary uppercase tracking-[0.3em]">COMANDOS DO MESTRE</h3>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <button
               onClick={() => onNext('add-provider')}
-              className="p-6 bg-primary/20 border-2 border-primary/30 rounded-[35px] flex flex-col items-start gap-4 hover:bg-primary transition-all group/btn active:scale-95"
+              className="w-full p-6 bg-primary/20 border-2 border-primary/30 rounded-[35px] flex items-center gap-6 hover:bg-primary transition-all group/btn active:scale-95"
             >
-              <div className="p-3 bg-primary/20 rounded-2xl group-hover/btn:bg-white/20 transition-colors">
-                <UserPlus className="text-primary group-hover/btn:text-background-dark" size={24} />
+              <div className="p-4 bg-primary/20 rounded-2xl group-hover/btn:bg-white/20 transition-colors">
+                <UserPlus className="text-primary group-hover/btn:text-background-dark" size={32} />
               </div>
-              <span className="text-xs font-black text-primary group-hover:text-background-dark uppercase tracking-widest leading-tight">NOVO <br />PRESTADOR</span>
-            </button>
-
-            <button className="p-6 bg-white/5 border border-white/10 rounded-[35px] flex flex-col items-start gap-4 opacity-40 grayscale group hover:opacity-100 transition-all cursor-not-allowed">
-              <div className="p-3 bg-white/5 rounded-2xl">
-                <Users className="text-white/40 group-hover:text-white" size={24} />
+              <div className="text-left">
+                <span className="text-lg font-black text-primary group-hover:text-background-dark uppercase tracking-widest leading-none block">NOVO PRESTADOR</span>
+                <span className="text-[10px] text-primary/40 font-bold uppercase tracking-[0.2em] group-hover:text-background-dark/50">CADASTRAR NOVO TRAMPO</span>
               </div>
-              <span className="text-xs font-black text-white/40 group-hover:text-white uppercase tracking-widest leading-tight">GESTÃO <br />USUÁRIOS</span>
             </button>
           </div>
         </div>
@@ -168,20 +164,6 @@ export const ProfileScreen = ({ isAdmin, isVisitor, onNext, providersCount }: { 
           <h3 className="text-xs font-black text-white/20 uppercase tracking-[0.3em]">NAVEGAÇÃO</h3>
         </div>
 
-        {isAdmin && (
-          <button
-            onClick={() => toast.info('Histórico de serviços')}
-            className="w-full bg-white/5 border border-white/10 p-6 rounded-[35px] flex items-center justify-between group hover:bg-white/10 transition-all active:scale-95"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-primary transition-all group-hover:rotate-12">
-                <MessageCircle className="text-white/40 group-hover:text-background-dark" size={20} />
-              </div>
-              <span className="text-white font-black text-[12px] uppercase tracking-widest">MEUS SERVIÇOS</span>
-            </div>
-            <ChevronRight size={20} className="text-white/20 group-hover:translate-x-2 transition-transform" />
-          </button>
-        )}
 
         {!isVisitor && !isInstalled && deferredPrompt && (
           <button
