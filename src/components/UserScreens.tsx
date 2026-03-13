@@ -394,7 +394,7 @@ export const AddProviderScreen = ({
   const [profileImg, setProfileImg] = useState('');
   const [portfolio, setPortfolio] = useState<string[]>([]);
   const [phone, setPhone] = useState('');
-  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState<string[]>([]);
   const [address, setAddress] = useState('');
 
   useEffect(() => {
@@ -402,11 +402,10 @@ export const AddProviderScreen = ({
       setName(providerToEdit.name);
       setRole(providerToEdit.role);
       setPhone(providerToEdit.phone || '');
-      setCategory(providerToEdit.category || '');
       setAddress(providerToEdit.address || '');
       setProfileImg(providerToEdit.profile_img);
       setPortfolio(providerToEdit.portfolio);
-      setCategory(providerToEdit.category || '');
+      setCategories(providerToEdit.categories || []);
     }
   }, [providerToEdit]);
 
@@ -483,13 +482,13 @@ export const AddProviderScreen = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !role) return toast.error('Preencha os campos tudo, sô!');
-    if (!category) return toast.error('Escolha uma categoria pro trem, uai!');
+    if (categories.length === 0) return toast.error('Escolha pelo menos uma categoria pro trem, uai!');
     if (!profileImg) return toast.error('Coloca uma foto de perfil pelo menos, uai!');
     onAdd({
       name,
       role,
       phone,
-      category,
+      categories,
       address,
       profile_img: profileImg,
       portfolio: portfolio.filter(img => !!img)
@@ -558,19 +557,28 @@ export const AddProviderScreen = ({
           <div className="space-y-4">
             <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] ml-1">CATEGORIA DO SERVIÇO</span>
             <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 no-scrollbar">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setCategory(cat.label)}
-                  className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all border ${category === cat.label
-                    ? 'bg-primary text-background-dark border-primary'
-                    : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'
-                    }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
+              {CATEGORIES.map((cat) => {
+                const isSelected = categories.includes(cat.label);
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => {
+                      if (isSelected) {
+                        setCategories(categories.filter(c => c !== cat.label));
+                      } else {
+                        setCategories([...categories, cat.label]);
+                      }
+                    }}
+                    className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all border ${isSelected
+                      ? 'bg-primary text-background-dark border-primary'
+                      : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'
+                      }`}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

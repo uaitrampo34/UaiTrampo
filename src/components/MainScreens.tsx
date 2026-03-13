@@ -117,7 +117,7 @@ export const HomeScreen = ({
   const [selectedPortfolio, setSelectedPortfolio] = useState<Provider | null>(null);
 
   const filteredProviders = activeFilter
-    ? providers.filter(p => p.category === activeFilter)
+    ? providers.filter(p => p.categories?.includes(activeFilter))
     : providers;
 
   const handleContact = (name: string) => {
@@ -221,6 +221,16 @@ export const HomeScreen = ({
                 </div>
                 <h3 className="font-black text-white text-xl tracking-tight leading-none group-hover:text-primary transition-colors">{p.name}</h3>
                 <p className="text-white/40 text-xs font-bold uppercase tracking-widest">{p.role}</p>
+                
+                {p.categories && p.categories.length > 0 && (
+                  <div className="flex flex-wrap gap-1 justify-center sm:justify-start pt-1">
+                    {p.categories.map(cat => (
+                      <span key={cat} className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[8px] font-bold text-white/30 uppercase tracking-tighter">
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {p.address && (
                   <div className="flex items-center gap-1.5 pt-1 justify-center sm:justify-start">

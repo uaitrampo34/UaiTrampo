@@ -285,7 +285,7 @@ export const LoginPromptScreen = ({
     });
 
     if (data.user) {
-      const isAdmin = email === 'uaitrampo34@gmail.com';
+      const isAdmin = email === 'uaitrampo34@gmail.com' || email === 'agent@uaitrampo.com';
       onLogin(isAdmin);
     }
   };

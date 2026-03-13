@@ -49,7 +49,7 @@ export const useProviders = () => {
           profile_img: newP.profile_img,
           portfolio: newP.portfolio || [],
           phone: newP.phone,
-          category: newP.category,
+          categories: newP.categories,
           address: newP.address,
           reviews: 0
         }
@@ -82,7 +82,7 @@ export const useProviders = () => {
         profile_img: updates.profile_img,
         portfolio: updates.portfolio,
         phone: updates.phone,
-        category: updates.category,
+        categories: updates.categories,
         address: updates.address
       })
       .eq('id', id)

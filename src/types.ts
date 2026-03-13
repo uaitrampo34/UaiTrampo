@@ -18,7 +18,7 @@ export interface Provider {
   profile_img: string;
   portfolio: string[];
   phone?: string;
-  category?: string;
+  categories: string[];
   address?: string;
   created_at?: string;
 }
