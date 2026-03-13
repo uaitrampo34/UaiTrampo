@@ -19,6 +19,28 @@ import { toast } from 'sonner';
 import { Screen } from '../types';
 import { supabase } from '../supabaseClient';
 
+export const SuccessTransition = ({ isAdmin }: { isAdmin: boolean }) => (
+  <div className="min-h-screen bg-background-dark p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+    <div className="absolute inset-0 bg-primary/5 animate-pulse" />
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      className="relative z-10 space-y-8"
+    >
+      <div className="w-32 h-32 bg-primary/20 rounded-[45px] flex items-center justify-center mx-auto border-2 border-primary/30 relative overflow-hidden animate-bounce">
+        <Zap className="text-primary" size={64} fill="currentColor" />
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-5xl font-black text-white italic tracking-tighter uppercase italic">
+          {isAdmin ? 'Mestre' : 'Bora'} <br />
+          <span className="text-primary not-italic text-3xl">Pro Trem!</span>
+        </h2>
+        <p className="text-white/40 text-xs font-bold uppercase tracking-[0.3em]">Carregando seu destino...</p>
+      </div>
+    </motion.div>
+  </div>
+);
+
 export const LoginScreen = ({ onNext, onVisitor }: { onNext: (s: Screen) => void, onVisitor: () => void }) => (
   <div className="min-h-screen bg-background-dark p-8 flex flex-col justify-end relative overflow-hidden">
     {/* Animated background blobs */}
@@ -257,20 +279,8 @@ export const LoginPromptScreen = ({
       password,
     });
 
-    if (error) {
-      toast.error('Erro no login, confere os dados aí!', { description: error.message });
-      console.error(error);
-      return;
-    }
-
     if (data.user) {
-      // Check if it's the master email we defined
       const isAdmin = email === 'uaitrampo34@gmail.com';
-      if (isAdmin) {
-        toast.success('Bem-vindo(a) de volta, Mestre DEV!', { icon: '👑' });
-      } else {
-        toast.success('Login realizado com sucesso!');
-      }
       onLogin(isAdmin);
     }
   };

@@ -28,6 +28,8 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isVisitor, setIsVisitor] = useState(false);
   const [editingProvider, setEditingProvider] = useState<Provider | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const {
     providers,
@@ -37,15 +39,48 @@ export default function App() {
     updateProvider
   } = useProviders();
 
+  // 1. Splash Timer
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
+  // 2. centralized Auth Listener
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth Event:', event, session?.user?.email);
+      
+      if (event === 'SIGNED_IN' || (event === 'INITIAL_SESSION' && session)) {
+        const adminStatus = session?.user?.email === 'uaitrampo34@gmail.com';
+        setIsAdmin(adminStatus);
+        setIsVisitor(false);
+        
+        // Only show transition for active logins, not initial loads
+        if (event === 'SIGNED_IN') {
+          setIsTransitioning(true);
+          setTimeout(() => {
+            setIsTransitioning(false);
+            setScreen('home');
+          }, 1500);
+        } else {
+          setScreen('home');
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setIsAdmin(false);
+        setIsVisitor(false);
+        setScreen('login');
+      }
+      
+      setSessionLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleLogin = (adminStatus: boolean) => {
-    setIsAdmin(adminStatus);
-    setIsVisitor(false);
-    setScreen('home');
+    // This is now redundant as onAuthStateChange handles it,
+    // but we can keep it for explicit UI feedback if needed.
+    // However, moving to home is handled by the listener.
   };
 
   const handleVisitorAccess = () => {
@@ -75,6 +110,12 @@ export default function App() {
   };
 
   const renderScreen = () => {
+    // Show nothing or a smooth background while checking session
+    if (sessionLoading) return <div className="min-h-screen bg-background-dark" />;
+    
+    // Safety buffer after login to prevent accidental clicks
+    if (isTransitioning) return <SuccessTransition isAdmin={isAdmin} />;
+
     if (loading && screen === 'home') {
       return (
         <div className="min-h-screen flex items-center justify-center bg-background-dark">
