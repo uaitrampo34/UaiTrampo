@@ -26,7 +26,7 @@ import { toast } from 'sonner';
 import { Screen, Provider } from '../types';
 import { supabase } from '../supabaseClient';
 
-export const ProfileScreen = ({ isAdmin, isVisitor, onNext }: { isAdmin: boolean, isVisitor: boolean, onNext: (s: Screen) => void }) => {
+export const ProfileScreen = ({ isAdmin, isVisitor, onNext, providersCount }: { isAdmin: boolean, isVisitor: boolean, onNext: (s: Screen) => void, providersCount: number }) => {
   const [user, setUser] = useState<any>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -61,7 +61,7 @@ export const ProfileScreen = ({ isAdmin, isVisitor, onNext }: { isAdmin: boolean
     }
   };
 
-  const displayName = isVisitor ? 'Visitante UaiTrampo' : (user?.user_metadata?.full_name || (isAdmin ? 'MESTRE DEV' : 'Usuário'));
+  const displayName = isVisitor ? 'Visitante UaiTrampo' : (isAdmin ? 'MESTRE DEV' : (user?.user_metadata?.full_name || 'Usuário'));
   const displayEmail = isVisitor ? 'ACESSO VISITANTE' : (user?.email || (isAdmin ? 'admin@uaitrampo.com' : 'usuario@uaitrampo.com'));
 
   return (
@@ -103,7 +103,7 @@ export const ProfileScreen = ({ isAdmin, isVisitor, onNext }: { isAdmin: boolean
           {isAdmin && (
             <div className="flex gap-4 w-full pt-4">
               <div className="flex-1 bg-white/5 border border-white/10 p-6 rounded-3xl text-center">
-                <p className="text-primary text-2xl font-black">12</p>
+                <p className="text-primary text-2xl font-black">{providersCount}</p>
                 <p className="text-[10px] text-white/20 font-bold uppercase text-center leading-none tracking-widest mt-1">TREMS CADASTRADOS</p>
               </div>
             </div>

@@ -110,7 +110,7 @@ export default function App() {
       case 'explore':
         return <ExploreScreen />;
       case 'profile':
-        return <ProfileScreen isAdmin={isAdmin} isVisitor={isVisitor} onNext={setScreen} />;
+        return <ProfileScreen isAdmin={isAdmin} isVisitor={isVisitor} onNext={setScreen} providersCount={providers.length} />;
       case 'settings':
         return <SettingsScreen onBack={() => setScreen('profile')} />;
       case 'add-provider':
