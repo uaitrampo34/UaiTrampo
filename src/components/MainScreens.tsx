@@ -6,6 +6,7 @@ import {
   Hammer,
   Paintbrush,
   PlugZap,
+  Droplets,
   ShieldCheck,
   Truck,
   Clock,
@@ -14,7 +15,6 @@ import {
   ArrowRight,
   Scissors,
   Wrench,
-  Droplets,
   HardHat,
   Monitor,
   Heart,
@@ -100,7 +100,9 @@ export const HomeScreen = ({
   onDelete,
   onEdit,
   onProfile,
-  onLoginRequired
+  onLoginRequired,
+  activeFilter,
+  setActiveFilter
 }: {
   providers: Provider[],
   isAdmin: boolean,
@@ -108,10 +110,11 @@ export const HomeScreen = ({
   onDelete: (id: string) => void,
   onEdit: (p: Provider) => void,
   onProfile: () => void,
-  onLoginRequired: () => void
+  onLoginRequired: () => void,
+  activeFilter: string | null,
+  setActiveFilter: (cat: string | null) => void
 }) => {
   const [selectedPortfolio, setSelectedPortfolio] = useState<Provider | null>(null);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   const filteredProviders = activeFilter
     ? providers.filter(p => p.category === activeFilter)
@@ -272,7 +275,7 @@ export const HomeScreen = ({
   );
 };
 
-export const ExploreScreen = () => (
+export const ExploreScreen = ({ onCategorySelect }: { onCategorySelect: (cat: string) => void }) => (
   <div className="min-h-screen bg-background-dark p-8 pb-40 relative">
     <div className="absolute top-1/4 -right-20 w-80 h-80 bg-primary/5 rounded-full blur-[120px]" />
 
@@ -290,35 +293,17 @@ export const ExploreScreen = () => (
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {[
-          { icon: <HardHat />, label: "Construção Civil", color: "bg-orange-600" },
-          { icon: <Wrench />, label: "Marido de Aluguel", color: "bg-blue-600" },
-          { icon: <Scissors />, label: "Barbeiro & Salão", color: "bg-pink-600" },
-          { icon: <Leaf />, label: "Jardinagem", color: "bg-emerald-600" },
-          { icon: <PlugZap />, label: "Eletricista", color: "bg-yellow-600" },
-          { icon: <Droplets />, label: "Encanador", color: "bg-sky-600" },
-          { icon: <Truck />, label: "Fretes & Mudanças", color: "bg-purple-600" },
-          { icon: <Clock />, label: "Diarista & Faxina", color: "bg-teal-500" },
-          { icon: <Car />, label: "Mecânica Aut.", color: "bg-slate-600" },
-          { icon: <Dog />, label: "Pet Shop/Banho", color: "bg-amber-500" },
-          { icon: <HardHat />, label: "Pedreiro", color: "bg-stone-500" },
-          { icon: <Paintbrush />, label: "Pintor", color: "bg-indigo-500" },
-          { icon: <ShieldCheck />, label: "Segurança/Alarmes", color: "bg-rose-500" },
-          { icon: <Monitor />, label: "Informática", color: "bg-cyan-500" },
-          { icon: <Heart />, label: "Saúde & Estética", color: "bg-red-400" },
-          { icon: <Utensils />, label: "Cozinheiro/Buffet", color: "bg-lime-600" },
-          { icon: <Sun />, label: "Piscineiro", color: "bg-blue-400" }
-        ].map((cat, i) => (
+        {CATEGORIES.map((cat, i) => (
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: i * 0.05 }}
-            key={cat.label}
+            key={cat.id}
           >
             <CategoryCard
               icon={cat.icon}
               label={cat.label}
-              onClick={() => toast.info(`Explorando ${cat.label}`)}
+              onClick={() => onCategorySelect(cat.label)}
             />
           </motion.div>
         ))}

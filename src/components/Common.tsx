@@ -13,7 +13,15 @@ import {
   Paintbrush,
   PlugZap,
   Droplets,
-  ShieldCheck
+  ShieldCheck,
+  Truck,
+  Clock,
+  Car,
+  Dog,
+  Monitor,
+  Heart,
+  Utensils,
+  Sun
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Screen } from '../types';
@@ -130,13 +138,21 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
 );
 
 export const CATEGORIES = [
-  { id: 'obras', label: 'Obras', icon: <HardHat /> },
-  { id: 'manutencao', label: 'Manutenção', icon: <Wrench /> },
-  { id: 'beleza', label: 'Beleza', icon: <Scissors /> },
-  { id: 'jardim', label: 'Jardim', icon: <Leaf /> },
-  { id: 'reparos', label: 'Reparos', icon: <HardHat /> },
-  { id: 'pintura', label: 'Pintura', icon: <Paintbrush /> },
-  { id: 'eletrica', label: 'Elétrica', icon: <PlugZap /> },
-  { id: 'hidraulica', label: 'Hidráulica', icon: <Droplets /> },
-  { id: 'seguranca', label: 'Segurança', icon: <ShieldCheck /> }
+  { id: 'construcao', label: 'Construção Civil', icon: <HardHat /> },
+  { id: 'marido', label: 'Marido de Aluguel', icon: <Wrench /> },
+  { id: 'beleza', label: 'Barbeiro & Salão', icon: <Scissors /> },
+  { id: 'jardim', label: 'Jardinagem', icon: <Leaf /> },
+  { id: 'eletrica', label: 'Eletricista', icon: <PlugZap /> },
+  { id: 'hidraulica', label: 'Encanador', icon: <Droplets /> },
+  { id: 'fretes', label: 'Fretes & Mudanças', icon: <Truck /> },
+  { id: 'limpeza', label: 'Diarista & Faxina', icon: <Clock /> },
+  { id: 'mecanica', label: 'Mecânica Aut.', icon: <Car /> },
+  { id: 'pet', label: 'Pet Shop/Banho', icon: <Dog /> },
+  { id: 'pedreiro', label: 'Pedreiro', icon: <HardHat /> },
+  { id: 'pintura', label: 'Pintor', icon: <Paintbrush /> },
+  { id: 'seguranca', label: 'Segurança/Alarmes', icon: <ShieldCheck /> },
+  { id: 'informatica', label: 'Informática', icon: <Monitor /> },
+  { id: 'saude', label: 'Saúde & Estética', icon: <Heart /> },
+  { id: 'buffet', label: 'Cozinheiro/Buffet', icon: <Utensils /> },
+  { id: 'piscina', label: 'Piscineiro', icon: <Sun /> }
 ];

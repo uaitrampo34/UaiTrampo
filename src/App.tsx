@@ -32,6 +32,7 @@ export default function App() {
   const [editingProvider, setEditingProvider] = useState<Provider | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   const {
     providers,
@@ -148,10 +149,19 @@ export default function App() {
             onEdit={handleEditProvider}
             onProfile={() => setScreen('profile')}
             onLoginRequired={() => setScreen('login-prompt')}
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
           />
         );
       case 'explore':
-        return <ExploreScreen />;
+        return (
+          <ExploreScreen
+            onCategorySelect={(cat) => {
+              setActiveFilter(cat);
+              setScreen('home');
+            }}
+          />
+        );
       case 'profile':
         return <ProfileScreen isAdmin={isAdmin} isVisitor={isVisitor} onNext={setScreen} providersCount={providers.length} />;
       case 'settings':
