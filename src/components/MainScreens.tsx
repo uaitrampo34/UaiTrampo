@@ -140,8 +140,8 @@ export const HomeScreen = ({
   return (
     <div className="pb-40">
       <Header onProfile={onProfile} />
-
-      <div className="p-8">
+      
+      <div className="px-4 sm:px-6 pt-32">
         <div className="flex flex-col gap-2 mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full w-fit border border-primary/20">
             <Sparkles className="text-primary" size={14} />
@@ -175,9 +175,9 @@ export const HomeScreen = ({
               layout
               initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
-              key={p.id}
-              onClick={() => p.portfolio && p.portfolio.length > 0 && setSelectedPortfolio(p)}
-              className={`bg-white/5 border border-white/10 p-6 rounded-[40px] flex items-center gap-6 hover:bg-white/10 transition-all group relative backdrop-blur-md ${p.portfolio && p.portfolio.length > 0 ? 'cursor-pointer active:scale-98' : ''}`}
+              key={p.id} 
+              onClick={() => setSelectedPortfolio(p)}
+              className={`bg-white/5 border border-white/10 p-4 sm:p-6 rounded-[30px] sm:rounded-[40px] flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 hover:bg-white/10 transition-all group relative backdrop-blur-md ${p.portfolio && p.portfolio.length > 0 ? 'cursor-pointer active:scale-98' : ''}`}
             >
               {isAdmin && (
                 <div className="absolute top-4 right-4 flex gap-2 z-10">
@@ -202,7 +202,7 @@ export const HomeScreen = ({
                 </div>
               )}
 
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all relative flex-shrink-0">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-[25px] sm:rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all relative flex-shrink-0">
                 <img src={p.profile_img} alt={p.name} className="w-full h-full object-cover transition-all duration-700" />
                 {p.portfolio && p.portfolio.length > 0 && (
                   <div className="absolute bottom-1 right-1 bg-primary text-background-dark text-[8px] font-black px-1.5 py-0.5 rounded-lg shadow-lg">
@@ -211,8 +211,8 @@ export const HomeScreen = ({
                 )}
               </div>
 
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-1.5 p-1 bg-primary/10 rounded-lg w-fit">
+              <div className="flex-1 w-full space-y-2 text-center sm:text-left">
+                <div className="flex items-center gap-1.5 p-1 bg-primary/10 rounded-lg w-fit mx-auto sm:mx-0">
                   <Star size={12} className="text-primary fill-primary" />
                   <span className="text-[10px] font-black text-primary uppercase tracking-tighter">{p.reviews} AVALIAÇÕES</span>
                 </div>
@@ -220,7 +220,7 @@ export const HomeScreen = ({
                 <p className="text-white/40 text-xs font-bold uppercase tracking-widest">{p.role}</p>
 
                 {p.address && (
-                  <div className="flex items-center gap-1.5 pt-1">
+                  <div className="flex items-center gap-1.5 pt-1 justify-center sm:justify-start">
                     <MapPin size={10} className="text-primary" />
                     <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest truncate">{p.address}</span>
                   </div>
