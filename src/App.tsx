@@ -12,8 +12,10 @@ import {
   LoginScreen,
   RegisterScreen,
   VerificationScreen,
-  LoginPromptScreen
+  LoginPromptScreen,
+  SuccessTransition
 } from './components/Auth';
+import { supabase } from './supabaseClient';
 import { HomeScreen, ExploreScreen } from './components/MainScreens';
 import {
   ProfileScreen,
