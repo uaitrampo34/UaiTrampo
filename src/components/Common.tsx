@@ -77,28 +77,28 @@ export const Header = ({ onProfile }: { onProfile: () => void }) => (
 );
 
 export const BottomNav = ({ screen, setScreen }: { screen: Screen, setScreen: (s: Screen) => void }) => (
-  <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-8 pointer-events-none z-50">
-    <div className="bg-white/5 backdrop-blur-2xl border border-white/10 p-3 rounded-[32px] flex justify-between items-center pointer-events-auto shadow-2xl shadow-black/80">
+  <nav className="fixed bottom-0 left-0 right-0 p-6 pointer-events-none z-50 flex justify-center">
+    <div className="bg-white/5 backdrop-blur-2xl border border-white/10 p-2 rounded-[32px] flex justify-between items-center pointer-events-auto shadow-2xl shadow-black/80 w-full max-w-sm">
       <button
         onClick={() => setScreen('home')}
-        className={`flex-1 flex flex-col items-center py-4 rounded-2xl transition-all ${screen === 'home' ? 'bg-primary text-background-dark shadow-xl shadow-primary/30 scale-105 font-bold' : 'text-white/40 hover:text-white'}`}
+        className={`flex-1 flex flex-col items-center py-4 rounded-2xl transition-all ${screen === 'home' ? 'bg-primary text-background-dark shadow-lg shadow-primary/30 scale-105 font-bold' : 'text-white/40 active:scale-90'}`}
       >
         <Home size={22} fill={screen === 'home' ? 'currentColor' : 'none'} />
       </button>
       <button
         onClick={() => setScreen('explore')}
-        className={`flex-1 flex flex-col items-center py-4 rounded-2xl transition-all ${screen === 'explore' ? 'bg-primary text-background-dark shadow-xl shadow-primary/30 scale-105 font-bold' : 'text-white/40 hover:text-white'}`}
+        className={`flex-1 flex flex-col items-center py-4 rounded-2xl transition-all ${screen === 'explore' ? 'bg-primary text-background-dark shadow-lg shadow-primary/30 scale-105 font-bold' : 'text-white/40 active:scale-90'}`}
       >
         <Search size={22} strokeWidth={screen === 'explore' ? 3 : 2} />
       </button>
       <button
         onClick={() => setScreen('profile')}
-        className={`flex-1 flex flex-col items-center py-4 rounded-2xl transition-all ${screen === 'profile' ? 'bg-primary text-background-dark shadow-xl shadow-primary/30 scale-105 font-bold' : 'text-white/40 hover:text-white'}`}
+        className={`flex-1 flex flex-col items-center py-4 rounded-2xl transition-all ${screen === 'profile' ? 'bg-primary text-background-dark shadow-lg shadow-primary/30 scale-105 font-bold' : 'text-white/40 active:scale-90'}`}
       >
         <UserIcon size={22} fill={screen === 'profile' ? 'currentColor' : 'none'} />
       </button>
     </div>
-  </div>
+  </nav>
 );
 
 interface CategoryCardProps {

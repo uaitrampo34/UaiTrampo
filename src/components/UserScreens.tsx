@@ -145,8 +145,10 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
             toast.success('Até mais ver, sô! Volta logo pro trem!');
             setTimeout(() => window.location.reload(), 1500);
           }}
-          className="w-full py-8 text-red-500 font-black text-[10px] uppercase tracking-[0.3em] hover:bg-red-500/10 rounded-[35px] transition-all flex items-center justify-center gap-3 mt-8 border-2 border-red-500/10"
+          className="w-full py-6 text-red-500 font-black text-[12px] uppercase tracking-[0.3em] hover:bg-red-500/10 rounded-[35px] transition-all flex items-center justify-center gap-3 mt-8 border-2 border-red-500/10 active:scale-95"
         >
+          <LogOut size={18} />
+          SAIR DA CONTA
         </button>
       </div>
     </div>

@@ -202,7 +202,7 @@ export const HomeScreen = ({
                 </div>
               )}
 
-              <div className="w-24 h-24 rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all relative">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all relative flex-shrink-0">
                 <img src={p.profile_img} alt={p.name} className="w-full h-full object-cover transition-all duration-700" />
                 {p.portfolio && p.portfolio.length > 0 && (
                   <div className="absolute bottom-1 right-1 bg-primary text-background-dark text-[8px] font-black px-1.5 py-0.5 rounded-lg shadow-lg">
