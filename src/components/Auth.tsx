@@ -127,7 +127,7 @@ export const RegisterScreen = ({ onNext }: { onNext: (s: Screen) => void }) => {
     if (!name || !email || !password) return toast.error('Preencha os campos tudo, sô!');
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -141,8 +141,13 @@ export const RegisterScreen = ({ onNext }: { onNext: (s: Screen) => void }) => {
       return;
     }
 
-    toast.success('Quase lá! Agora confirma seu e-mail.');
-    onNext('verify');
+    if (data.session) {
+      toast.success('Cadastro realizado! Seja bem-vindo ao trem.');
+      // The App.tsx listener will catch SIGNED_IN and handle the transition
+    } else {
+      toast.success('Quase lá! Agora confirma seu e-mail.');
+      onNext('verify');
+    }
   };
 
   return (
