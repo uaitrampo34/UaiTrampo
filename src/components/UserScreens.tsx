@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Sparkles,
   Zap,
+  Download,
   Star,
   Trash2,
   MapPin,
@@ -27,12 +28,36 @@ import { supabase } from '../supabaseClient';
 
 export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (s: Screen) => void }) => {
   const [user, setUser] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
     });
+
+    const handleBeforeInstall = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true);
+    }
+
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
   }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   const displayName = user?.user_metadata?.full_name || (isAdmin ? 'MESTRE DEV' : 'Usuário');
   const displayEmail = user?.email || (isAdmin ? 'admin@uaitrampo.com' : 'usuario@uaitrampo.com');
@@ -136,6 +161,24 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
               <span className="text-white font-black text-[12px] uppercase tracking-widest">MEUS SERVIÇOS</span>
             </div>
             <ChevronRight size={20} className="text-white/20 group-hover:translate-x-2 transition-transform" />
+          </button>
+        )}
+
+        {!isInstalled && deferredPrompt && (
+          <button
+            onClick={handleInstall}
+            className="w-full bg-primary/20 border-2 border-primary/30 p-6 rounded-[35px] flex items-center justify-between group hover:bg-primary transition-all active:scale-95"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/20 rounded-2xl group-hover:bg-white/20 transition-all">
+                <Download className="text-primary group-hover:text-background-dark" size={20} />
+              </div>
+              <div className="text-left">
+                <span className="text-primary font-black text-[12px] uppercase tracking-widest group-hover:text-background-dark block">INSTALAR APP</span>
+                <span className="text-[8px] text-primary/40 font-bold uppercase tracking-[0.2em] group-hover:text-background-dark/50">TER ACESSO RÁPIDO</span>
+              </div>
+            </div>
+            <ChevronRight size={20} className="text-primary/20 group-hover:text-background-dark/40 group-hover:translate-x-2 transition-transform" />
           </button>
         )}
 

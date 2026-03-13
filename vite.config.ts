@@ -16,10 +16,12 @@ export default defineConfig(({mode}) => {
         manifest: {
           name: 'UaiTrampo',
           short_name: 'UaiTrampo',
-          description: 'Serviços em Frutal',
-          theme_color: '#ffffff',
-          background_color: '#ffffff',
+          description: 'Serviços em Frutal - Encontre os melhores profissionais!',
+          theme_color: '#0a0a0a',
+          background_color: '#0a0a0a',
           display: 'standalone',
+          start_url: '/',
+          orientation: 'portrait-primary',
           icons: [
             {
               src: 'pwa-192x192.png',
