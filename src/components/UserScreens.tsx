@@ -26,15 +26,17 @@ import { toast } from 'sonner';
 import { Screen, Provider } from '../types';
 import { supabase } from '../supabaseClient';
 
-export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (s: Screen) => void }) => {
+export const ProfileScreen = ({ isAdmin, isVisitor, onNext }: { isAdmin: boolean, isVisitor: boolean, onNext: (s: Screen) => void }) => {
   const [user, setUser] = useState<any>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
+    if (!isVisitor) {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        setUser(user);
+      });
+    }
 
     const handleBeforeInstall = (e: any) => {
       e.preventDefault();
@@ -48,7 +50,7 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
     }
 
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-  }, []);
+  }, [isVisitor]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
@@ -59,8 +61,8 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
     }
   };
 
-  const displayName = user?.user_metadata?.full_name || (isAdmin ? 'MESTRE DEV' : 'Usuário');
-  const displayEmail = user?.email || (isAdmin ? 'admin@uaitrampo.com' : 'usuario@uaitrampo.com');
+  const displayName = isVisitor ? 'Visitante UaiTrampo' : (user?.user_metadata?.full_name || (isAdmin ? 'MESTRE DEV' : 'Usuário'));
+  const displayEmail = isVisitor ? 'ACESSO VISITANTE' : (user?.email || (isAdmin ? 'admin@uaitrampo.com' : 'usuario@uaitrampo.com'));
 
   return (
     <div className="min-h-screen bg-background-dark p-8 pb-40">
@@ -69,12 +71,14 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
           <div className="h-1 w-8 bg-primary rounded-full" />
           <h2 className="text-4xl font-black text-white italic tracking-tighter">MEU <span className="text-primary not-italic">PERFIL</span></h2>
         </div>
-        <button
-          onClick={() => onNext('settings')}
-          className="p-4 bg-white/5 rounded-3xl border border-white/10 text-white/40 active:scale-90 transition-transform"
-        >
-          <SettingsIcon size={24} />
-        </button>
+        {!isVisitor && (
+          <button
+            onClick={() => onNext('settings')}
+            className="p-4 bg-white/5 rounded-3xl border border-white/10 text-white/40 active:scale-90 transition-transform"
+          >
+            <SettingsIcon size={24} />
+          </button>
+        )}
       </div>
 
       {/* Premium Profile Card */}
@@ -83,7 +87,7 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
         <div className="relative bg-white/5 border border-white/10 p-8 rounded-[40px] flex flex-col items-center gap-6 backdrop-blur-xl">
           <div className="relative">
             <div className="w-28 h-28 rounded-[35px] bg-primary flex items-center justify-center border-4 border-background-dark shadow-2xl overflow-hidden group-hover:rotate-6 transition-transform">
-              <span className="text-background-dark text-4xl font-black">{isAdmin ? 'DEV' : (displayName[0] || 'U')}</span>
+              <span className="text-background-dark text-4xl font-black">{isAdmin ? 'DEV' : (displayName[0] || 'V')}</span>
             </div>
             {isAdmin && (
               <div className="absolute -top-3 -right-3 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full border-2 border-background-dark shadow-xl animate-bounce">
@@ -107,7 +111,22 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
         </div>
       </div>
 
-      {!isAdmin && (
+      {isVisitor ? (
+        <div className="space-y-4 mb-12">
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full bg-primary text-background-dark py-6 rounded-[30px] font-black text-xl active:scale-95 shadow-2xl shadow-primary/30"
+          >
+            ENTRAR NA MINHA CONTA
+          </button>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full bg-white/5 border border-white/10 py-6 rounded-[30px] font-black text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95"
+          >
+            CRIAR UMA CONTA AGORA
+          </button>
+        </div>
+      ) : !isAdmin && (
         <button
           onClick={() => onNext('edit-profile')}
           className="w-full bg-white/5 border border-white/10 py-6 rounded-[30px] font-black text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95 mb-12"
@@ -164,7 +183,7 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
           </button>
         )}
 
-        {!isInstalled && deferredPrompt && (
+        {!isVisitor && !isInstalled && deferredPrompt && (
           <button
             onClick={handleInstall}
             className="w-full bg-primary/20 border-2 border-primary/30 p-6 rounded-[35px] flex items-center justify-between group hover:bg-primary transition-all active:scale-95"
@@ -184,6 +203,10 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
 
         <button
           onClick={async () => {
+            if (isVisitor) {
+              window.location.reload();
+              return;
+            }
             await supabase.auth.signOut();
             toast.success('Até mais ver, sô! Volta logo pro trem!');
             setTimeout(() => window.location.reload(), 1500);
@@ -191,7 +214,7 @@ export const ProfileScreen = ({ isAdmin, onNext }: { isAdmin: boolean, onNext: (
           className="w-full py-6 text-red-500 font-black text-[12px] uppercase tracking-[0.3em] hover:bg-red-500/10 rounded-[35px] transition-all flex items-center justify-center gap-3 mt-8 border-2 border-red-500/10 active:scale-95"
         >
           <LogOut size={18} />
-          SAIR DA CONTA
+          {isVisitor ? 'VOLTAR AO LOGIN' : 'SAIR DA CONTA'}
         </button>
       </div>
     </div>
