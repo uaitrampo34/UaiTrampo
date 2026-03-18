@@ -292,8 +292,8 @@ export const HomeScreen = ({
 
                 {p.address && (
                   <div className="flex items-center gap-1.5 pt-1 justify-center sm:justify-start">
-                    <MapPin size={10} className="text-primary" />
-                    <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest truncate">{p.address}</span>
+                    <MapPin size={12} className="text-primary" />
+                    <span className="text-[11px] font-black text-primary uppercase tracking-widest truncate">{p.address}</span>
                   </div>
                 )}
 
