@@ -34,6 +34,9 @@ export default function App() {
   const [sessionLoading, setSessionLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
+    return localStorage.getItem('uaitrampo_notifications') !== 'false';
+  });
 
   const {
     providers,
@@ -80,6 +83,35 @@ export default function App() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // 3. Realtime Notifications for new providers
+  useEffect(() => {
+    if (!notificationsEnabled) return;
+
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'providers',
+        },
+        (payload) => {
+          console.log('Novo prestador detectado!', payload);
+          toast.success('Uai! Novo prestador na área!', {
+            description: `${payload.new.name} acabou de chegar!`,
+            icon: '🚀',
+            duration: 5000,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [notificationsEnabled]);
 
   const handleLogin = (adminStatus: boolean) => {
     // This is now redundant as onAuthStateChange handles it,
@@ -166,7 +198,17 @@ export default function App() {
       case 'profile':
         return <ProfileScreen isAdmin={isAdmin} isVisitor={isVisitor} onNext={setScreen} providersCount={providers.length} />;
       case 'settings':
-        return <SettingsScreen onBack={() => setScreen('profile')} onNext={setScreen} />;
+        return (
+          <SettingsScreen 
+            onBack={() => setScreen('profile')} 
+            onNext={setScreen}
+            notificationsEnabled={notificationsEnabled}
+            onToggleNotifications={(val) => {
+              setNotificationsEnabled(val);
+              localStorage.setItem('uaitrampo_notifications', String(val));
+            }}
+          />
+        );
       case 'privacy-policy':
         return <PrivacyPolicyScreen onBack={() => setScreen('settings')} />;
       case 'add-provider':

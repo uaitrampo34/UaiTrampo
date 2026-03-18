@@ -322,7 +322,17 @@ export const EditUserProfileScreen = ({
   );
 };
 
-export const SettingsScreen = ({ onBack, onNext }: { onBack: () => void, onNext?: (s: Screen) => void }) => (
+export const SettingsScreen = ({ 
+  onBack, 
+  onNext,
+  notificationsEnabled,
+  onToggleNotifications
+}: { 
+  onBack: () => void, 
+  onNext?: (s: Screen) => void,
+  notificationsEnabled: boolean,
+  onToggleNotifications: (val: boolean) => void
+}) => (
   <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden">
     <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px]" />
 
@@ -345,8 +355,21 @@ export const SettingsScreen = ({ onBack, onNext }: { onBack: () => void, onNext?
           </div>
           <div className="bg-white/5 border border-white/10 rounded-[40px] overflow-hidden backdrop-blur-xl">
             {[
-              { icon: Bell, label: "Notificações", sub: "Alertas de novos serviços", action: () => toast.info('Notificações ativadas!') },
-              { icon: Shield, label: "Privacidade", sub: "Quem pode ver seus trens", action: () => onNext ? onNext('privacy-policy') : null }
+              { 
+                icon: Bell, 
+                label: "Notificações", 
+                sub: notificationsEnabled ? "Recebendo alertas de novos trens" : "Alertas desativados",
+                isToggle: true,
+                active: notificationsEnabled,
+                action: () => onToggleNotifications(!notificationsEnabled)
+              },
+              { 
+                icon: Shield, 
+                label: "Privacidade", 
+                sub: "Quem pode ver seus trens", 
+                isToggle: false,
+                action: () => onNext ? onNext('privacy-policy') : null 
+              }
             ].map((item, i, arr) => (
               <div
                 key={item.label}
@@ -355,14 +378,20 @@ export const SettingsScreen = ({ onBack, onNext }: { onBack: () => void, onNext?
               >
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-primary/20 transition-colors">
-                    <item.icon className="text-white/40 group-hover:text-primary" size={20} />
+                    <item.icon className={`transition-colors ${item.active ? 'text-primary' : 'text-white/40 group-hover:text-primary'}`} size={20} />
                   </div>
                   <div>
                     <p className="text-white font-black text-sm uppercase tracking-widest">{item.label}</p>
                     <p className="text-white/20 text-[10px] font-bold uppercase mt-0.5">{item.sub}</p>
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-white/20 group-hover:translate-x-2 transition-transform" />
+                {item.isToggle ? (
+                  <div className={`w-12 h-6 rounded-full relative transition-colors ${item.active ? 'bg-primary' : 'bg-white/10'}`}>
+                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${item.active ? 'left-7' : 'left-1'}`} />
+                  </div>
+                ) : (
+                  <ChevronRight size={16} className="text-white/20 group-hover:translate-x-2 transition-transform" />
+                )}
               </div>
             ))}
           </div>
