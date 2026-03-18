@@ -154,5 +154,6 @@ export const CATEGORIES = [
   { id: 'informatica', label: 'Informática', icon: <Monitor /> },
   { id: 'saude', label: 'Saúde & Estética', icon: <Heart /> },
   { id: 'buffet', label: 'Cozinheiro/Buffet', icon: <Utensils /> },
-  { id: 'piscina', label: 'Piscineiro', icon: <Sun /> }
+  { id: 'piscina', label: 'Piscineiro', icon: <Sun /> },
+  { id: 'borracharia', label: 'Borracharia Volante', icon: <Wrench /> }
 ];
