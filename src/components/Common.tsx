@@ -138,22 +138,22 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
 );
 
 export const CATEGORIES = [
-  { id: 'construcao', label: 'Construção Civil', icon: <HardHat /> },
-  { id: 'marido', label: 'Marido de Aluguel', icon: <Wrench /> },
   { id: 'beleza', label: 'Barbeiro & Salão', icon: <Scissors /> },
-  { id: 'jardim', label: 'Jardinagem', icon: <Leaf /> },
+  { id: 'borracharia', label: 'Borracharia Volante', icon: <Wrench /> },
+  { id: 'construcao', label: 'Construção Civil', icon: <HardHat /> },
+  { id: 'buffet', label: 'Cozinheiro/Buffet', icon: <Utensils /> },
+  { id: 'limpeza', label: 'Diarista & Faxina', icon: <Clock /> },
   { id: 'eletrica', label: 'Eletricista', icon: <PlugZap /> },
   { id: 'hidraulica', label: 'Encanador', icon: <Droplets /> },
   { id: 'fretes', label: 'Fretes & Mudanças', icon: <Truck /> },
-  { id: 'limpeza', label: 'Diarista & Faxina', icon: <Clock /> },
-  { id: 'mecanica', label: 'Mecânica Aut.', icon: <Car /> },
-  { id: 'pet', label: 'Pet Shop/Banho', icon: <Dog /> },
-  { id: 'pedreiro', label: 'Pedreiro', icon: <HardHat /> },
-  { id: 'pintura', label: 'Pintor', icon: <Paintbrush /> },
-  { id: 'seguranca', label: 'Segurança/Alarmes', icon: <ShieldCheck /> },
   { id: 'informatica', label: 'Informática', icon: <Monitor /> },
-  { id: 'saude', label: 'Saúde & Estética', icon: <Heart /> },
-  { id: 'buffet', label: 'Cozinheiro/Buffet', icon: <Utensils /> },
+  { id: 'jardim', label: 'Jardinagem', icon: <Leaf /> },
+  { id: 'marido', label: 'Marido de Aluguel', icon: <Wrench /> },
+  { id: 'mecanica', label: 'Mecânica Aut.', icon: <Car /> },
+  { id: 'pedreiro', label: 'Pedreiro', icon: <HardHat /> },
+  { id: 'pet', label: 'Pet Shop/Banho', icon: <Dog /> },
+  { id: 'pintura', label: 'Pintor', icon: <Paintbrush /> },
   { id: 'piscina', label: 'Piscineiro', icon: <Sun /> },
-  { id: 'borracharia', label: 'Borracharia Volante', icon: <Wrench /> }
+  { id: 'saude', label: 'Saúde & Estética', icon: <Heart /> },
+  { id: 'seguranca', label: 'Segurança/Alarmes', icon: <ShieldCheck /> }
 ];
