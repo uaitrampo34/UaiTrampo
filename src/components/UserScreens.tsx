@@ -322,7 +322,7 @@ export const EditUserProfileScreen = ({
   );
 };
 
-export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
+export const SettingsScreen = ({ onBack, onNext }: { onBack: () => void, onNext?: (s: Screen) => void }) => (
   <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden">
     <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px]" />
 
@@ -345,12 +345,12 @@ export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
           </div>
           <div className="bg-white/5 border border-white/10 rounded-[40px] overflow-hidden backdrop-blur-xl">
             {[
-              { icon: Bell, label: "Notificações", sub: "Alertas de novos serviços" },
-              { icon: Shield, label: "Privacidade", sub: "Quem pode ver seus trens" }
+              { icon: Bell, label: "Notificações", sub: "Alertas de novos serviços", action: () => toast.info('Notificações ativadas!') },
+              { icon: Shield, label: "Privacidade", sub: "Quem pode ver seus trens", action: () => onNext ? onNext('privacy-policy') : null }
             ].map((item, i, arr) => (
               <div
                 key={item.label}
-                onClick={() => toast.info(item.label)}
+                onClick={item.action}
                 className={`p-6 flex items-center justify-between hover:bg-white/5 cursor-pointer group transition-colors ${i !== arr.length - 1 ? 'border-b border-white/5' : ''}`}
               >
                 <div className="flex items-center gap-4">
@@ -375,6 +375,66 @@ export const SettingsScreen = ({ onBack }: { onBack: () => void }) => (
           FALAR CO O SUPORTE
           <MessageCircle size={24} className="group-hover:rotate-12 transition-transform" />
         </button>
+      </div>
+    </div>
+  </div>
+);
+
+export const PrivacyPolicyScreen = ({ onBack }: { onBack: () => void }) => (
+  <div className="min-h-screen bg-background-dark p-8 relative overflow-hidden flex flex-col">
+    <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px]" />
+    
+    <div className="relative z-10 flex-1">
+      <div className="flex items-center gap-6 mt-4 mb-12">
+        <button
+          onClick={onBack}
+          className="p-4 bg-white/5 rounded-2xl border border-white/10 text-white/40 active:scale-90 transition-transform"
+        >
+          <ArrowRight className="rotate-180" size={24} strokeWidth={3} />
+        </button>
+        <h2 className="text-4xl font-black text-white italic tracking-tighter leading-none text-left">PRIVACIDADE <br /><span className="text-primary not-italic text-3xl">& SEGURANÇA</span></h2>
+      </div>
+
+      <div className="space-y-8 pb-32">
+        <section className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Shield className="text-primary" size={18} />
+            <h3 className="text-sm font-black text-primary uppercase tracking-[0.2em]">1. Proteção de Dados</h3>
+          </div>
+          <p className="text-white/60 text-sm leading-relaxed font-medium">
+            Usamos o sistema do Supabase para autenticação. Seus dados de login são criptografados e o desenvolvedor do app não tem acesso à sua senha. Só quem é prestador cadastrado ou administrador tem permissão para alterar informações no banco de dados.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Users className="text-primary" size={18} />
+            <h3 className="text-sm font-black text-primary uppercase tracking-[0.2em]">2. Para os Prestadores</h3>
+          </div>
+          <p className="text-white/60 text-sm leading-relaxed font-medium">
+            Exibimos apenas as informações que você nos fornece voluntariamente: Nome, Foto, Endereço e Contato (WhatsApp). Não vendemos seus dados para listas de marketing. Seu contato é usado exclusivamente para que os clientes falem direto com você.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Sparkles className="text-primary" size={18} />
+            <h3 className="text-sm font-black text-primary uppercase tracking-[0.2em]">3. Segurança dos Clientes</h3>
+          </div>
+          <p className="text-white/60 text-sm leading-relaxed font-medium">
+            O app não possui anúncios de terceiros nem links que pedem dados bancários. O UaiTrampo é uma vitrine de talentos locais; todo o acerto de serviço é feito fora do app.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Zap className="text-primary" size={18} />
+            <h3 className="text-sm font-black text-primary uppercase tracking-[0.2em]">4. Compromisso</h3>
+          </div>
+          <p className="text-white/60 text-sm leading-relaxed font-medium">
+            O "Mestre DEV" faz varreduras constantes para garantir a segurança. Se notar algo estranho, fale com a gente pelo botão de suporte nos Ajustes.
+          </p>
+        </section>
       </div>
     </div>
   </div>

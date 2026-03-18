@@ -21,7 +21,8 @@ import {
   ProfileScreen,
   SettingsScreen,
   AddProviderScreen,
-  EditUserProfileScreen
+  EditUserProfileScreen,
+  PrivacyPolicyScreen
 } from './components/UserScreens';
 
 export default function App() {
@@ -165,7 +166,9 @@ export default function App() {
       case 'profile':
         return <ProfileScreen isAdmin={isAdmin} isVisitor={isVisitor} onNext={setScreen} providersCount={providers.length} />;
       case 'settings':
-        return <SettingsScreen onBack={() => setScreen('profile')} />;
+        return <SettingsScreen onBack={() => setScreen('profile')} onNext={setScreen} />;
+      case 'privacy-policy':
+        return <PrivacyPolicyScreen onBack={() => setScreen('settings')} />;
       case 'add-provider':
         return (
           <AddProviderScreen

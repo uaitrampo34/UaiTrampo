@@ -8,7 +8,8 @@ export type Screen =
   | 'settings'
   | 'login-prompt'
   | 'add-provider'
-  | 'edit-profile';
+  | 'edit-profile'
+  | 'privacy-policy';
 
 export interface Provider {
   id: string;
