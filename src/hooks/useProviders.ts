@@ -23,7 +23,18 @@ export const useProviders = () => {
     setLoading(false);
   };
 
+  const checkAdmin = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email !== 'uaitrampo34@gmail.com') {
+      toast.error('Opa! Ocê não tem permissão de MESTRE pra mexer nisso, sô!');
+      return false;
+    }
+    return true;
+  };
+
   const deleteProvider = async (id: string) => {
+    if (!(await checkAdmin())) return false;
+    
     const { error } = await supabase
       .from('providers')
       .delete()
@@ -40,6 +51,8 @@ export const useProviders = () => {
   };
 
   const addProvider = async (newP: Omit<Provider, 'id' | 'reviews'>) => {
+    if (!(await checkAdmin())) return null;
+
     const { data, error } = await supabase
       .from('providers')
       .insert([
@@ -74,6 +87,8 @@ export const useProviders = () => {
   };
 
   const updateProvider = async (id: string, updates: Partial<Provider>) => {
+    if (!(await checkAdmin())) return null;
+
     const { data, error } = await supabase
       .from('providers')
       .update({
