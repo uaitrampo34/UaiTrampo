@@ -7,18 +7,45 @@ export const useProviders = () => {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const getWeekSeed = () => {
+    const now = new Date();
+    const oneJan = new Date(now.getFullYear(), 0, 1);
+    const numberOfDays = Math.floor((now.getTime() - oneJan.getTime()) / (24 * 60 * 60 * 1000));
+    const week = Math.ceil((now.getDay() + 1 + numberOfDays) / 7);
+    return `${now.getFullYear()}-${week}`;
+  };
+
+  const hashString = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash;
+  };
+
   const fetchProviders = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('providers')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('*');
 
     if (error) {
       console.error('Erro ao buscar prestadores:', error);
       toast.error('Erro ao carregar prestadores do banco.');
     } else {
-      setProviders(data || []);
+      const allProviders = data || [];
+      const seed = getWeekSeed();
+      
+      // Filter inactive and sort deterministically by week
+      const processed = allProviders
+        .sort((a, b) => {
+          const hashA = hashString(a.id + seed);
+          const hashB = hashString(b.id + seed);
+          return hashA - hashB;
+        });
+
+      setProviders(processed);
     }
     setLoading(false);
   };
@@ -64,6 +91,8 @@ export const useProviders = () => {
           phone: newP.phone,
           categories: newP.categories,
           address: newP.address,
+          subscription_expires_at: newP.subscription_expires_at,
+          is_active: newP.is_active ?? true,
           reviews: 0
         }
       ])
@@ -98,7 +127,9 @@ export const useProviders = () => {
         portfolio: updates.portfolio,
         phone: updates.phone,
         categories: updates.categories,
-        address: updates.address
+        address: updates.address,
+        subscription_expires_at: updates.subscription_expires_at,
+        is_active: updates.is_active
       })
       .eq('id', id)
       .select();
@@ -125,3 +156,4 @@ export const useProviders = () => {
 
   return { providers, loading, fetchProviders, deleteProvider, addProvider, updateProvider };
 };
+

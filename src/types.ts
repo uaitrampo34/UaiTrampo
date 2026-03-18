@@ -22,4 +22,6 @@ export interface Provider {
   categories: string[];
   address?: string;
   created_at?: string;
+  subscription_expires_at?: string;
+  is_active?: boolean;
 }

@@ -485,6 +485,8 @@ export const AddProviderScreen = ({
   const [phone, setPhone] = useState('');
   const [categories, setCategories] = useState<string[]>([]);
   const [address, setAddress] = useState('');
+  const [isActive, setIsActive] = useState(true);
+  const [subscriptionExpiresAt, setSubscriptionExpiresAt] = useState('');
 
   useEffect(() => {
     if (providerToEdit) {
@@ -495,6 +497,8 @@ export const AddProviderScreen = ({
       setProfileImg(providerToEdit.profile_img);
       setPortfolio(providerToEdit.portfolio);
       setCategories(providerToEdit.categories || []);
+      setIsActive(providerToEdit.is_active ?? true);
+      setSubscriptionExpiresAt(providerToEdit.subscription_expires_at ? new Date(providerToEdit.subscription_expires_at).toISOString().split('T')[0] : '');
     }
   }, [providerToEdit]);
 
@@ -580,7 +584,9 @@ export const AddProviderScreen = ({
       categories,
       address,
       profile_img: profileImg,
-      portfolio: portfolio.filter(img => !!img)
+      portfolio: portfolio.filter(img => !!img),
+      is_active: isActive,
+      subscription_expires_at: subscriptionExpiresAt ? new Date(subscriptionExpiresAt).toISOString() : undefined
     });
   };
 
@@ -597,6 +603,62 @@ export const AddProviderScreen = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-10 flex-1">
+          {/* Admin Tools: Subscription & Status */}
+          <div className="bg-primary/5 border-2 border-primary/20 p-6 rounded-[35px] space-y-6">
+            <div className="flex items-center gap-3 mb-2">
+              <Shield className="text-primary" size={16} />
+              <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">CONTROLE DO MESTRE</h3>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white font-black text-xs uppercase tracking-widest">STATUS DO TREM</p>
+                <p className="text-white/20 text-[8px] font-bold uppercase mt-0.5">{isActive ? "Visível para todos" : "Escondido do público"}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsActive(!isActive)}
+                className={`w-12 h-6 rounded-full relative transition-colors ${isActive ? 'bg-primary' : 'bg-white/10'}`}
+              >
+                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${isActive ? 'left-7' : 'left-1'}`} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-white font-black text-xs uppercase tracking-widest">VALIDADE DA ASSINATURA</p>
+              <div className="flex gap-2">
+                <input 
+                  type="date"
+                  value={subscriptionExpiresAt}
+                  onChange={(e) => setSubscriptionExpiresAt(e.target.value)}
+                  className="flex-1 bg-white/5 border border-white/10 p-4 rounded-2xl text-white text-xs font-bold outline-none focus:border-primary transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 30);
+                    setSubscriptionExpiresAt(d.toISOString().split('T')[0]);
+                  }}
+                  className="px-4 bg-primary/20 text-primary text-[10px] font-black rounded-2xl border border-primary/20"
+                >
+                  +30d
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 90);
+                    setSubscriptionExpiresAt(d.toISOString().split('T')[0]);
+                  }}
+                  className="px-4 bg-primary/20 text-primary text-[10px] font-black rounded-2xl border border-primary/20"
+                >
+                  +90d
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-col items-center gap-4 group">
             <div className="relative">
               <div className="w-32 h-32 rounded-[40px] bg-white/5 border-4 border-dashed border-white/10 flex items-center justify-center overflow-hidden group-hover:border-primary transition-all">

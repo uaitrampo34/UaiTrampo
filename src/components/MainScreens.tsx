@@ -170,9 +170,18 @@ export const HomeScreen = ({
 }) => {
   const [selectedPortfolio, setSelectedPortfolio] = useState<Provider | null>(null);
 
+  const now = new Date();
+  const filteredBySubscription = isAdmin 
+    ? providers 
+    : providers.filter(p => {
+        if (p.is_active === false) return false;
+        if (p.subscription_expires_at && new Date(p.subscription_expires_at) < now) return false;
+        return true;
+      });
+
   const filteredProviders = activeFilter
-    ? providers.filter(p => p.categories?.includes(activeFilter))
-    : providers;
+    ? filteredBySubscription.filter(p => p.categories?.includes(activeFilter))
+    : filteredBySubscription;
 
   const handleContact = (name: string) => {
     if (isVisitor) {
@@ -231,82 +240,95 @@ export const HomeScreen = ({
         <div className="grid gap-6 mt-12 pb-20">
           {filteredProviders.length === 0 ? (
             <ProviderCTA isFull />
-          ) : filteredProviders.map((p, idx) => (
-            <motion.div
-              layout
-              initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              key={p.id} 
-              onClick={() => setSelectedPortfolio(p)}
-              className={`bg-white/5 border border-white/10 p-4 sm:p-6 rounded-[30px] sm:rounded-[40px] flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 hover:bg-white/10 transition-all group relative backdrop-blur-md ${p.portfolio && p.portfolio.length > 0 ? 'cursor-pointer active:scale-98' : ''}`}
-            >
-              {isAdmin && (
-                <div className="absolute top-4 right-4 flex gap-2 z-10">
+          ) : filteredProviders.map((p, idx) => {
+            const isExpired = p.subscription_expires_at && new Date(p.subscription_expires_at) < now;
+            const isInactive = p.is_active === false;
+
+            return (
+              <motion.div
+                layout
+                initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                key={p.id} 
+                onClick={() => setSelectedPortfolio(p)}
+                className={`bg-white/5 border border-white/10 p-4 sm:p-6 rounded-[30px] sm:rounded-[40px] flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 hover:bg-white/10 transition-all group relative backdrop-blur-md ${p.portfolio && p.portfolio.length > 0 ? 'cursor-pointer active:scale-98' : ''} ${(isExpired || isInactive) && isAdmin ? 'opacity-50 ring-2 ring-red-500/20' : ''}`}
+              >
+                {isAdmin && (
+                  <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
+                    <div className="flex gap-2">
+                       <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(p);
+                        }}
+                        className="p-3 bg-white/10 text-white rounded-2xl hover:bg-primary hover:text-background-dark transition-all"
+                      >
+                        <Wrench size={18} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(p.id);
+                        }}
+                        className="p-3 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                    {isInactive && (
+                      <span className="bg-red-500 text-white text-[8px] font-black px-2 py-1 rounded-full uppercase tracking-widest">INATIVO</span>
+                    )}
+                    {isExpired && (
+                      <span className="bg-orange-500 text-white text-[8px] font-black px-2 py-1 rounded-full uppercase tracking-widest">VENCIDO</span>
+                    )}
+                  </div>
+                )}
+
+                <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-[25px] sm:rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all relative flex-shrink-0">
+                  <img src={p.profile_img} alt={p.name} className="w-full h-full object-cover transition-all duration-700" />
+                  {p.portfolio && p.portfolio.length > 0 && (
+                    <div className="absolute bottom-1 right-1 bg-primary text-background-dark text-[8px] font-black px-1.5 py-0.5 rounded-lg shadow-lg">
+                      +{p.portfolio.length} FOTOS
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 w-full space-y-2 text-center sm:text-left">
+                  <div className="flex items-center gap-1.5 p-1 bg-primary/10 rounded-lg w-fit mx-auto sm:mx-0">
+                    <Star size={12} className="text-primary fill-primary" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-tighter">{p.reviews} AVALIAÇÕES</span>
+                  </div>
+                  <h3 className="font-black text-white text-xl tracking-tight leading-none group-hover:text-primary transition-colors">{p.name}</h3>
+                  <p className="text-white/40 text-xs font-bold uppercase tracking-widest">{p.role}</p>
+                  
+                  {p.categories && p.categories.length > 0 && (
+                    <div className="flex flex-wrap gap-1 justify-center sm:justify-start pt-1">
+                      {p.categories.map(cat => (
+                        <span key={cat} className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[8px] font-bold text-white/30 uppercase tracking-tighter">
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {p.address && (
+                    <div className="flex items-center gap-1.5 pt-1 justify-center sm:justify-start">
+                      <MapPin size={12} className="text-primary" />
+                      <span className="text-[11px] font-black text-primary uppercase tracking-widest truncate">{p.address}</span>
+                    </div>
+                  )}
+
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(p);
-                    }}
-                    className="p-3 bg-white/10 text-white rounded-2xl hover:bg-primary hover:text-background-dark transition-all"
+                    onClick={() => handleContact(p.name)}
+                    className="w-full mt-4 bg-white text-background-dark py-4 rounded-2xl font-black text-[10px] tracking-[0.2em] hover:bg-primary transition-all active:scale-90 flex items-center justify-center gap-2 group/btn"
                   >
-                    <Wrench size={18} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(p.id);
-                    }}
-                    className="p-3 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all"
-                  >
-                    <Trash2 size={18} />
+                    MANDAR UM ZAP
+                    <MessageCircle size={14} className="group-hover/btn:rotate-12 transition-transform" />
                   </button>
                 </div>
-              )}
-
-              <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-[25px] sm:rounded-[30px] overflow-hidden border-2 border-primary/20 bg-primary/5 shadow-2xl group-hover:border-primary transition-all relative flex-shrink-0">
-                <img src={p.profile_img} alt={p.name} className="w-full h-full object-cover transition-all duration-700" />
-                {p.portfolio && p.portfolio.length > 0 && (
-                  <div className="absolute bottom-1 right-1 bg-primary text-background-dark text-[8px] font-black px-1.5 py-0.5 rounded-lg shadow-lg">
-                    +{p.portfolio.length} FOTOS
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-1 w-full space-y-2 text-center sm:text-left">
-                <div className="flex items-center gap-1.5 p-1 bg-primary/10 rounded-lg w-fit mx-auto sm:mx-0">
-                  <Star size={12} className="text-primary fill-primary" />
-                  <span className="text-[10px] font-black text-primary uppercase tracking-tighter">{p.reviews} AVALIAÇÕES</span>
-                </div>
-                <h3 className="font-black text-white text-xl tracking-tight leading-none group-hover:text-primary transition-colors">{p.name}</h3>
-                <p className="text-white/40 text-xs font-bold uppercase tracking-widest">{p.role}</p>
-                
-                {p.categories && p.categories.length > 0 && (
-                  <div className="flex flex-wrap gap-1 justify-center sm:justify-start pt-1">
-                    {p.categories.map(cat => (
-                      <span key={cat} className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[8px] font-bold text-white/30 uppercase tracking-tighter">
-                        {cat}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {p.address && (
-                  <div className="flex items-center gap-1.5 pt-1 justify-center sm:justify-start">
-                    <MapPin size={12} className="text-primary" />
-                    <span className="text-[11px] font-black text-primary uppercase tracking-widest truncate">{p.address}</span>
-                  </div>
-                )}
-
-                <button
-                  onClick={() => handleContact(p.name)}
-                  className="w-full mt-4 bg-white text-background-dark py-4 rounded-2xl font-black text-[10px] tracking-[0.2em] hover:bg-primary transition-all active:scale-90 flex items-center justify-center gap-2 group/btn"
-                >
-                  MANDAR UM ZAP
-                  <MessageCircle size={14} className="group-hover/btn:rotate-12 transition-transform" />
-                </button>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 
