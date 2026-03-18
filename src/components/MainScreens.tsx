@@ -23,7 +23,8 @@ import {
   Leaf,
   Utensils,
   Sun,
-  MapPin
+  MapPin,
+  UserPlus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
@@ -90,6 +91,59 @@ const PortfolioCarousel = ({ images }: { images: string[] }) => {
         </>
       )}
     </div>
+  );
+};
+
+const ProviderCTA = ({ isFull }: { isFull?: boolean }) => {
+  const handleJoin = () => {
+    const phone = '5534996506860';
+    const message = encodeURIComponent('Olá! Vi o UaiTrampo e gostaria de saber mais sobre como ser um prestador parceiro, sô!');
+    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+  };
+
+  if (isFull) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-12 p-8 bg-emerald-uai/5 border-2 border-dashed border-emerald-uai/20 rounded-[40px] flex flex-col items-center text-center gap-6 backdrop-blur-sm"
+      >
+        <div className="w-20 h-20 bg-emerald-uai/20 rounded-[30px] flex items-center justify-center text-emerald-uai">
+          <UserPlus size={40} strokeWidth={2.5} />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-2xl font-black text-white italic tracking-tighter">BORA TRAMPAR <br /><span className="text-emerald-uai not-italic">COM A GENTE?</span></h3>
+          <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest px-4">Mostre seu talento pros mineiros de Frutal e região!</p>
+        </div>
+        <button
+          onClick={handleJoin}
+          className="w-full bg-emerald-uai text-background-dark py-6 rounded-[30px] font-black text-lg active:scale-95 shadow-2xl shadow-emerald-uai/20 transition-all flex items-center justify-center gap-3 font-sans"
+        >
+          UAI SÔ, VÊM TRAMPAR CÔ NÓIS!?
+          <ArrowRight size={20} strokeWidth={3} />
+        </button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleJoin}
+      className="w-full mt-8 p-6 bg-emerald-uai/10 border-2 border-emerald-uai/30 rounded-[35px] flex items-center justify-between group hover:bg-emerald-uai transition-all active:scale-95"
+    >
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-emerald-uai/20 rounded-2xl group-hover:bg-white/20 transition-all">
+          <HardHat className="text-emerald-uai group-hover:text-background-dark" size={24} />
+        </div>
+        <div className="text-left">
+          <span className="text-emerald-uai font-black text-[12px] uppercase tracking-widest group-hover:text-background-dark block leading-none mb-1">TRABALHE CONOSCO</span>
+          <span className="text-[10px] text-white font-black italic tracking-tighter group-hover:text-background-dark/80">uai sô, vêm trampar cô nóis!?</span>
+        </div>
+      </div>
+      <div className="p-3 bg-white/5 rounded-xl group-hover:bg-background-dark/10 transition-colors">
+        <ArrowRight size={18} className="text-emerald-uai group-hover:text-background-dark group-hover:translate-x-1 transition-all" strokeWidth={3} />
+      </div>
+    </button>
   );
 };
 
@@ -171,9 +225,13 @@ export const HomeScreen = ({
             />
           ))}
         </div>
+        
+        <ProviderCTA />
 
-        <div className="grid gap-6 mt-4 pb-20">
-          {filteredProviders.map((p, idx) => (
+        <div className="grid gap-6 mt-12 pb-20">
+          {filteredProviders.length === 0 ? (
+            <ProviderCTA isFull />
+          ) : filteredProviders.map((p, idx) => (
             <motion.div
               layout
               initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
