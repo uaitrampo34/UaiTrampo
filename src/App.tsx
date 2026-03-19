@@ -22,7 +22,8 @@ import {
   SettingsScreen,
   AddProviderScreen,
   EditUserProfileScreen,
-  PrivacyPolicyScreen
+  PrivacyPolicyScreen,
+  ManageAdsScreen
 } from './components/UserScreens';
 
 export default function App() {
@@ -229,6 +230,8 @@ export default function App() {
             onUpdate={() => setScreen('profile')}
           />
         );
+      case 'manage-ads':
+        return <ManageAdsScreen onBack={() => setScreen('profile')} />;
       default:
         return <LoginScreen onNext={setScreen} onVisitor={handleVisitorAccess} />;
     }

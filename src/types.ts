@@ -9,7 +9,8 @@ export type Screen =
   | 'login-prompt'
   | 'add-provider'
   | 'edit-profile'
-  | 'privacy-policy';
+  | 'privacy-policy'
+  | 'manage-ads';
 
 export interface Provider {
   id: string;
@@ -24,4 +25,13 @@ export interface Provider {
   created_at?: string;
   subscription_expires_at?: string;
   is_active?: boolean;
+}
+
+export interface Ad {
+  id: string;
+  image_url: string;
+  company_name: string;
+  link_url?: string;
+  is_active?: boolean;
+  created_at?: string;
 }

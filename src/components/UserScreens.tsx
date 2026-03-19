@@ -16,15 +16,21 @@ import {
   Zap,
   Download,
   Star,
-  Trash2,
   MapPin,
-  User
+  User,
+  ArrowLeft,
+  Image as ImageIcon,
+  Link as LinkIcon,
+  Check,
+  Trash2,
+  Edit2
 } from 'lucide-react';
 import { CATEGORIES } from './Common';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 import { Screen, Provider } from '../types';
 import { supabase } from '../supabaseClient';
+import { useAds } from '../hooks/useAds';
 
 export const ProfileScreen = ({ isAdmin, isVisitor, onNext, providersCount }: { isAdmin: boolean, isVisitor: boolean, onNext: (s: Screen) => void, providersCount: number }) => {
   const [user, setUser] = useState<any>(null);
@@ -152,6 +158,18 @@ export const ProfileScreen = ({ isAdmin, isVisitor, onNext, providersCount }: { 
               <div className="text-left">
                 <span className="text-lg font-black text-primary group-hover:text-background-dark uppercase tracking-widest leading-none block">NOVO PRESTADOR</span>
                 <span className="text-[10px] text-primary/40 font-bold uppercase tracking-[0.2em] group-hover:text-background-dark/50">CADASTRAR NOVO TRAMPO</span>
+              </div>
+            </button>
+            <button
+              onClick={() => onNext('manage-ads')}
+              className="w-full p-6 bg-primary/20 border-2 border-primary/30 rounded-[35px] flex items-center gap-6 hover:bg-primary transition-all group/btn active:scale-95"
+            >
+              <div className="p-4 bg-primary/20 rounded-2xl group-hover/btn:bg-white/20 transition-colors">
+                <ImageIcon className="text-primary group-hover/btn:text-background-dark" size={32} />
+              </div>
+              <div className="text-left">
+                <span className="text-lg font-black text-primary group-hover:text-background-dark uppercase tracking-widest leading-none block">GERIR ANÚNCIOS</span>
+                <span className="text-[10px] text-primary/40 font-bold uppercase tracking-[0.2em] group-hover:text-background-dark/50">BANNERS ROTATIVOS</span>
               </div>
             </button>
           </div>
@@ -761,6 +779,237 @@ export const AddProviderScreen = ({
             <button type="button" onClick={onBack} className="w-full py-2 text-white/20 text-xs font-black uppercase tracking-widest hover:text-white transition-colors">CANCELAR OPERAÇÃO</button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+};
+
+export const ManageAdsScreen = ({ onBack }: { onBack: () => void }) => {
+  const { ads, loading, addAd, deleteAd, updateAd } = useAds();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    company_name: '',
+    image_url: '',
+    link_url: '',
+    is_active: true
+  });
+
+  const processImage = (base64Str: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const MAX_DIM = 1200;
+        
+        // Mantendo a proporção aproximada de landscape se a imagem for mto grande
+        if (width > height) {
+          if (width > MAX_DIM) {
+            height *= MAX_DIM / width;
+            width = MAX_DIM;
+          }
+        } else {
+          if (height > MAX_DIM) {
+            width *= MAX_DIM / height;
+            height = MAX_DIM;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+    });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) return toast.error('A imagem tá muito pesada! Escolha uma menor (até 5MB).');
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const compressed = await processImage(event.target?.result as string);
+      setFormData({ ...formData, image_url: compressed });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.company_name || !formData.image_url) {
+      toast.error('Preencha os campos obrigatórios (Título e Imagem).');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    if (editingId) {
+      const result = await updateAd(editingId, formData);
+      if (result) {
+        setEditingId(null);
+        setFormData({ company_name: '', image_url: '', link_url: '', is_active: true });
+      }
+    } else {
+      const result = await addAd(formData);
+      if (result) {
+        setFormData({ company_name: '', image_url: '', link_url: '', is_active: true });
+      }
+    }
+    
+    setIsSubmitting(false);
+  };
+
+  const handleEdit = (ad: any) => {
+    setEditingId(ad.id);
+    setFormData({
+      company_name: ad.company_name,
+      image_url: ad.image_url,
+      link_url: ad.link_url || '',
+      is_active: ad.is_active ?? true
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const toggleStatus = async (ad: any) => {
+    await updateAd(ad.id, { is_active: !ad.is_active });
+  };
+
+  return (
+    <div className="min-h-screen bg-background-dark p-6 pb-24">
+      <div className="flex items-center gap-4 mb-8">
+        <button onClick={onBack} className="p-3 bg-white/5 rounded-xl text-white active:scale-90 transition-transform flex items-center justify-center">
+          <ArrowLeft size={20} />
+        </button>
+        <h2 className="text-2xl font-black italic tracking-tighter text-white uppercase">Anúncios <span className="text-primary not-italic">Premium</span></h2>
+      </div>
+
+      <div className="mb-8 bg-white/5 p-6 rounded-[30px] border border-white/10">
+        <h3 className="text-primary font-black uppercase tracking-widest text-xs mb-4">{editingId ? 'Editar Anúncio' : 'Adicionar Novo'}</h3>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          <div className="flex flex-col items-center gap-4 group">
+            <div className="relative w-full aspect-[21/9] rounded-[20px] bg-white/5 border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden group-hover:border-primary transition-all">
+              {formData.image_url ? (
+                <img src={formData.image_url} alt="Preview do Banner" className="w-full h-full object-cover transition-all duration-700" />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-white/20 group-hover:text-primary transition-colors">
+                  <Camera size={32} />
+                  <span className="text-xs font-black uppercase tracking-widest">Toque para upar o banner (16:9) *</span>
+                </div>
+              )}
+              <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+            </div>
+            {formData.image_url && (
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, image_url: '' })}
+                className="text-red-500 text-xs font-black uppercase tracking-widest py-1 px-3 bg-red-500/10 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
+              >
+                Remover Imagem
+              </button>
+            )}
+            <p className="text-[10px] text-white/40 text-center uppercase tracking-wider font-bold">
+              Ou cole a URL direta da imagem abaixo:
+            </p>
+            <div className="relative w-full">
+              <ImageIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+              <input 
+                type="url"
+                value={formData.image_url}
+                onChange={e => setFormData({ ...formData, image_url: e.target.value })}
+                className="w-full bg-background-dark border border-white/10 p-4 pl-12 rounded-[20px] text-white text-sm focus:border-primary transition-all outline-none"
+                placeholder="https://sua-imagem.com/banner.jpg"
+              />
+            </div>
+          </div>
+          
+          <div className="h-px w-full bg-white/10 my-4" />
+
+          <div>
+            <label className="text-[10px] text-white/40 uppercase font-black tracking-widest block mb-2 ml-2">Empresa/Título *</label>
+            <div className="relative">
+              <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+              <input 
+                type="text"
+                value={formData.company_name}
+                onChange={e => setFormData({ ...formData, company_name: e.target.value })}
+                className="w-full bg-background-dark border border-white/10 p-4 pl-12 rounded-[20px] text-white text-sm focus:border-primary transition-all outline-none"
+                placeholder="Ex: Frutal Construções"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="text-[10px] text-white/40 uppercase font-black tracking-widest block mb-2 ml-2">URL do Link (Opcional)</label>
+            <div className="relative">
+              <LinkIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+              <input 
+                type="url"
+                value={formData.link_url}
+                onChange={e => setFormData({ ...formData, link_url: e.target.value })}
+                className="w-full bg-background-dark border border-white/10 p-4 pl-12 rounded-[20px] text-white text-sm focus:border-primary transition-all outline-none"
+                placeholder="WhatsApp ou Site"
+              />
+            </div>
+          </div>
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="w-full bg-primary text-background-dark py-4 rounded-[20px] font-black uppercase text-sm tracking-widest hover:bg-white active:scale-95 transition-all mt-6 shadow-xl shadow-primary/20 disabled:opacity-50 flex justify-center items-center gap-2"
+          >
+            {isSubmitting ? 'Salvando...' : (editingId ? 'Atualizar Anúncio' : 'Cadastrar Anúncio')}
+          </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+                setFormData({ company_name: '', image_url: '', link_url: '', is_active: true });
+              }}
+              className="w-full text-white/40 font-black uppercase tracking-widest text-xs hover:text-white transition-colors py-2"
+            >
+              Cancelar Edição
+            </button>
+          )}
+        </form>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-white font-black italic tracking-tighter text-xl uppercase mb-6 ml-2">Anúncios Ativos</h3>
+        {loading ? (
+          <p className="text-white/40 text-sm italic font-bold ml-2">Carregando os trens...</p>
+        ) : ads.length === 0 ? (
+          <p className="text-white/40 text-sm italic font-bold ml-2">Nenhum anúncio rodando sô.</p>
+        ) : (
+          ads.map(ad => (
+            <div key={ad.id} className={`bg-white/5 border ${ad.is_active ? 'border-primary/30' : 'border-red-500/30'} p-4 rounded-[25px] flex items-center gap-4 transition-colors`}>
+              <div className="w-24 h-14 bg-black/50 rounded-xl overflow-hidden flex-shrink-0 border border-white/10">
+                <img src={ad.image_url} alt={ad.company_name} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/400x225/101010/333333?text=Erro')} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-white font-black text-sm uppercase tracking-wide truncate">{ad.company_name}</h4>
+                <p className={`text-[10px] font-black tracking-widest uppercase mt-1 ${ad.is_active ? 'text-primary' : 'text-red-500'}`}>{ad.is_active ? 'Rodando' : 'Pausado'}</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => toggleStatus(ad)} className={`p-3 rounded-xl active:scale-90 transition-all ${ad.is_active ? 'bg-primary/20 text-primary hover:bg-primary hover:text-black' : 'bg-white/10 text-white/40 hover:bg-white/20'}`}>
+                  <Check size={18} strokeWidth={3} />
+                </button>
+                <button onClick={() => handleEdit(ad)} className="p-3 bg-white/10 text-white rounded-xl hover:bg-white/20 active:scale-90 transition-all">
+                  <Edit2 size={18} strokeWidth={2} />
+                </button>
+                <button onClick={() => deleteAd(ad.id)} className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white active:scale-90 transition-all">
+                  <Trash2 size={18} strokeWidth={2} />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

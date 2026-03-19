@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Star,
@@ -30,6 +30,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { Provider } from '../types';
 import { CategoryCard, Header, CATEGORIES } from './Common';
+import { useAds } from '../hooks/useAds';
+import { Ad } from '../types';
 
 const PortfolioCarousel = ({ images }: { images: string[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -147,6 +149,81 @@ const ProviderCTA = ({ isFull }: { isFull?: boolean }) => {
   );
 };
 
+const AdCarousel = () => {
+  const { ads, loading } = useAds();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const activeAds = ads.filter(ad => ad.is_active);
+
+  useEffect(() => {
+    if (activeAds.length <= 1 || isPaused) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % activeAds.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [activeAds.length, isPaused]);
+
+  if (loading || activeAds.length === 0) return null;
+
+  const currentAd = activeAds[currentIndex];
+
+  const handleAdClick = (url?: string) => {
+    if (url) window.open(url, '_blank');
+  };
+
+  return (
+    <div 
+      className="relative w-full aspect-[21/9] sm:aspect-[21/7] rounded-[30px] sm:rounded-[40px] overflow-hidden group cursor-pointer border border-white/10 shadow-2xl mb-10"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onClick={() => handleAdClick(currentAd.link_url)}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentIndex}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          className="absolute inset-0"
+        >
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+          <img
+            src={currentAd.image_url}
+            alt={currentAd.company_name}
+            className="w-full h-full object-cover"
+            onError={(e) => (e.currentTarget.style.display = 'none')}
+          />
+        </motion.div>
+      </AnimatePresence>
+      
+      <div className="absolute bottom-4 left-6 right-6 z-20 flex items-end justify-between">
+        <div>
+          <span className="bg-primary/20 text-primary border border-primary/20 text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest backdrop-blur-md mb-1.5 inline-block">Patrocinado</span>
+          <h3 className="text-white font-black text-lg sm:text-xl leading-none italic tracking-tighter drop-shadow-lg">{currentAd.company_name}</h3>
+        </div>
+        {currentAd.link_url && (
+          <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl text-white group-hover:bg-primary group-hover:text-background-dark transition-colors">
+            <ArrowRight size={16} className="-rotate-45" />
+          </div>
+        )}
+      </div>
+
+      {activeAds.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+          {activeAds.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-4 bg-primary' : 'w-1.5 bg-white/30'}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const HomeScreen = ({
   providers,
   isAdmin,
@@ -208,6 +285,9 @@ export const HomeScreen = ({
       <Header onProfile={onProfile} />
       
       <div className="px-4 sm:px-6 pt-32">
+        
+        <AdCarousel />
+
         <div className="flex flex-col gap-2 mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full w-fit border border-primary/20">
             <Sparkles className="text-primary" size={14} />
