@@ -113,7 +113,7 @@ const ProviderCTA = ({ isFull }: { isFull?: boolean }) => {
         </div>
         <div className="space-y-2">
           <h3 className="text-2xl font-black text-white italic tracking-tighter">BORA TRAMPAR <br /><span className="text-emerald-uai not-italic">COM A GENTE?</span></h3>
-          <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest px-4">Mostre seu talento pros mineiros de Frutal e região!</p>
+          <p className="text-white/40 text-[12px] font-bold uppercase tracking-widest px-4">Mostre seu talento pros mineiros de Frutal e região!</p>
         </div>
         <button
           onClick={handleJoin}
@@ -137,7 +137,7 @@ const ProviderCTA = ({ isFull }: { isFull?: boolean }) => {
         </div>
         <div className="text-left">
           <span className="text-emerald-uai font-black text-[12px] uppercase tracking-widest group-hover:text-background-dark block leading-none mb-1">TRABALHE CONOSCO</span>
-          <span className="text-[10px] text-white font-black italic tracking-tighter group-hover:text-background-dark/80">uai sô, vêm trampar cô nóis!?</span>
+          <span className="text-[13px] text-white font-black italic tracking-tighter group-hover:text-background-dark/80">uai sô, vêm trampar cô nóis!?</span>
         </div>
       </div>
       <div className="p-3 bg-white/5 rounded-xl group-hover:bg-background-dark/10 transition-colors">
